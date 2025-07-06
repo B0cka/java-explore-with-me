@@ -21,3 +21,5 @@ services:
       context: ./ewm-service
     ports:
       - "8080:8080"
+    depends_on:
+      - db
