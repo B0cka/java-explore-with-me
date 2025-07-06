@@ -14,7 +14,8 @@
 	<modules>
 		<module>main-service</module>
 		<module>main-service/stats-client</module>
-		<module>stats-service</module>
+		<module>stats-server</module>
+		<module>stats-dto</module>
 	</modules>
 
 	<groupId>ru.practicum</groupId>

@@ -1,0 +1,32 @@
+package ru.practicum.StatsController;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.StatsService.StatsService;
+import ru.practicum.statsdto.RequestDto;
+import ru.practicum.statsdto.StatsDto;
+
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+public class Controller {
+
+    StatsService statsService;
+
+    @PostMapping("/hit")
+    public String createHit(@RequestBody RequestDto requestDto,
+                            HttpServletRequest request) {
+        return statsService.createHit(requestDto, request);
+    }
+
+    @GetMapping("/stats")
+    public List<StatsDto> getStats(@RequestParam String start,
+                                   @RequestParam String end,
+                                   @RequestParam(required = false) List<String> uris,
+                                   @RequestParam(defaultValue = "false") boolean unique){
+
+        return statsService.getStats(start, end, uris, unique);
+    }
+}

@@ -1,0 +1,84 @@
+package ru.practicum.StatsService;
+
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import ru.practicum.Model.Hit;
+import ru.practicum.StatsRepository.StatsRepository;
+import ru.practicum.statsdto.RequestDto;
+import ru.practicum.statsdto.StatsDto;
+import java.time.format.DateTimeFormatter;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class StatsServiceImpl implements StatsService {
+
+    private final StatsRepository statsRepository;
+
+    @Override
+    public String createHit(RequestDto requestDto, HttpServletRequest request) {
+        String ip = request.getRemoteAddr();
+        String uri = request.getRequestURI();
+
+        log.info("Получен hit: app={}, uri={}, ip={}",
+                requestDto.getApp(), uri, ip);
+        Hit hit = Hit.builder()
+                .uri(uri)
+                .app(requestDto.getApp())
+                .ip(ip)
+                .build();
+        try {
+            statsRepository.save(hit);
+            return "Информация сохранена";
+        } catch (Exception e) {
+            log.error("Ошибка при отправке данных на stats-server: {}", e.getMessage());
+            return "Ошибка при сохранении";
+        }
+    }
+
+    @Override
+    public List<StatsDto> getStats(String start, String end, List<String> uris, boolean unique) {
+        log.info("Получен запрос статистики: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime startTime = LocalDateTime.parse(start, formatter);
+            LocalDateTime endTime = LocalDateTime.parse(end, formatter);
+
+            List<Object[]> rawData = unique
+                    ? statsRepository.findUniqueStats(startTime, endTime, uris)
+                    : statsRepository.findStats(startTime, endTime, uris);
+
+            List<StatsDto> stats = new ArrayList<>();
+            for (Object[] row : rawData) {
+                String app = (String) row[0];
+                String uri = (String) row[1];
+                Long hits = (Long) row[2];
+
+                StatsDto dto = StatsDto.builder()
+                        .app(app)
+                        .url(uri)
+                        .hits(hits)
+                        .build();
+                stats.add(dto);
+            }
+
+            return stats;
+
+        } catch (Exception e) {
+            log.error("Ошибка при обработке статистики: {}", e.getMessage());
+            throw new RuntimeException("Не удалось обработать запрос статистики", e);
+        }
+    }
+
+
+
+}
