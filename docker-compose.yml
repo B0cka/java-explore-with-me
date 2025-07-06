@@ -11,8 +11,11 @@ services:
     image: postgres:16.1
 
   main-service:
+    image: main-service
+    build:
+      context: ./main-service
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
-
   main-db:
     image: postgres:16.1
