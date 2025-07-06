@@ -1,5 +1,9 @@
 services:
   stats-server:
+    image: stats-server
+    build:
+      context: ./stats-service
+      dockerfile: Dockerfile
     ports:
       - "9090:9090"
 
