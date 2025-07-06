@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class Controller {
 
-    StatsService statsService;
+    private     final StatsService statsService;
 
     @PostMapping("/hit")
     public String createHit(@RequestBody RequestDto requestDto,
