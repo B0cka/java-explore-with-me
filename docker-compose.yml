@@ -2,7 +2,7 @@ services:
   stats-server:
     image: stats-server
     build:
-      context: ./stats-service
+      context: ./stats-server
       dockerfile: Dockerfile
     ports:
       - "9090:9090"
