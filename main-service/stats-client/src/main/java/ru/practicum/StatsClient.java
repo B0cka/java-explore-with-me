@@ -15,18 +15,18 @@ public class StatsClient {
 
     RestTemplate restTemplate;
 
-    public String createHit(RequestDto requestDto){
+    public String createHit(RequestDto requestDto) {
         String statsServerUrl = "http://localhost:9090/hit";
 
         return restTemplate.postForObject(statsServerUrl, requestDto, String.class);
     }
 
-    public List<StatsDto> getStats(String start, String end, List<String> uris,boolean unique) {
+    public List<StatsDto> getStats(String start, String end, List<String> uris, boolean unique) {
         StringBuilder statsServerUrl = new StringBuilder("http://localhost:9090/stats");
-        statsServerUrl.append("?start="+start).append("&end="+end).append("&unique="+unique);
-        if(uris.size() != 0){
-            for(String q : uris){
-                statsServerUrl.append("&uris="+q);
+        statsServerUrl.append("?start=" + start).append("&end=" + end).append("&unique=" + unique);
+        if (uris.size() != 0) {
+            for (String q : uris) {
+                statsServerUrl.append("&uris=" + q);
             }
         }
         String finalURI = statsServerUrl.toString();

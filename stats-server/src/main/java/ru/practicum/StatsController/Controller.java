@@ -25,7 +25,7 @@ public class Controller {
     public List<StatsDto> getStats(@RequestParam String start,
                                    @RequestParam String end,
                                    @RequestParam(required = false) List<String> uris,
-                                   @RequestParam(defaultValue = "false") boolean unique){
+                                   @RequestParam(defaultValue = "false") boolean unique) {
 
         return statsService.getStats(start, end, uris, unique);
     }
