@@ -11,9 +11,9 @@ services:
     image: postgres:16.1
 
   ewm-service:
-    image: main-service
+    image: ewm-service
     build:
-      context: ./main-service
+      context: ./ewm-service
       dockerfile: Dockerfile
     ports:
       - "8080:8080"

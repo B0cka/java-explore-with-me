@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>main-service</artifactId>
+    <artifactId>ewm-service</artifactId>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
