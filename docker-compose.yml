@@ -1,21 +1,22 @@
 services:
+  db:
+    image: postgres:16.1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+    ports:
+      - "6541:5432"
+
   stats-server:
-    image: stats-server
     build:
       context: ./stats-server
-      dockerfile: Dockerfile
     ports:
       - "9090:9090"
-
-  stats-db:
-    image: postgres:16.1
+    depends_on:
+      - db
 
   ewm-service:
-    image: ewm-service
     build:
       context: ./ewm-service
-      dockerfile: Dockerfile
     ports:
       - "8080:8080"
-  main-db:
-    image: postgres:16.1
