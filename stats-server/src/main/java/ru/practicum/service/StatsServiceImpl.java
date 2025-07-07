@@ -65,7 +65,7 @@ public class StatsServiceImpl implements StatsService {
 
                 StatsDto dto = StatsDto.builder()
                         .app(app)
-                        .url(uri)
+                        .uri(uri)
                         .hits(hits)
                         .build();
                 stats.add(dto);

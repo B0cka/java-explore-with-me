@@ -10,7 +10,7 @@ public class StatsDto {
 
     private String app;
 
-    private String url;
+    private String uri;
 
     private Long hits;
 
