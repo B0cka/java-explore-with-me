@@ -23,8 +23,8 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public String createHit(RequestDto requestDto, HttpServletRequest request) {
-        String ip = request.getRemoteAddr();
-        String uri = request.getRequestURI();
+        String ip = requestDto.getIp();
+        String uri = requestDto.getUri();
 
         log.info("Получен hit: app={}, uri={}, ip={}",
                 requestDto.getApp(), uri, ip);
