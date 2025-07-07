@@ -57,7 +57,6 @@ public class StatsServiceImpl implements StatsService {
             List<Object[]> rawData = unique
                     ? statsRepository.findUniqueStats(startTime, endTime, uris)
                     : statsRepository.findStats(startTime, endTime, uris);
-
             List<StatsDto> stats = new ArrayList<>();
             for (Object[] row : rawData) {
                 String app = (String) row[0];
