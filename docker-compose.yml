@@ -4,15 +4,18 @@ services:
       context: ./stats-server
     ports:
       - "9090:9090"
-
-  stats-db:
-    image: postgres:16.1
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+
+  stats-db:
+    image: postgres:16.1
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
     ports:
       - "6541:5432"
 
