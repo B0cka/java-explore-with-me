@@ -9,8 +9,6 @@ import ru.practicum.repository.StatsRepository;
 import ru.practicum.statsdto.RequestDto;
 import ru.practicum.statsdto.StatsDto;
 
-import java.time.format.DateTimeFormatter;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,17 +43,14 @@ public class StatsServiceImpl implements StatsService {
     }
 
     @Override
-    public List<StatsDto> getStats(String start, String end, List<String> uris, boolean unique) {
+    public List<StatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
         log.info("Получен запрос статистики: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
 
         try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime startTime = LocalDateTime.parse(start, formatter);
-            LocalDateTime endTime = LocalDateTime.parse(end, formatter);
 
             List<Object[]> rawData = unique
-                    ? statsRepository.findUniqueStats(startTime, endTime, uris)
-                    : statsRepository.findStats(startTime, endTime, uris);
+                    ? statsRepository.findUniqueStats(start, end, uris)
+                    : statsRepository.findStats(start, end, uris);
 
             List<StatsDto> stats = new ArrayList<>();
             for (Object[] row : rawData) {
