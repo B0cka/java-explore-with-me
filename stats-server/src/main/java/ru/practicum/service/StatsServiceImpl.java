@@ -58,7 +58,7 @@ public class StatsServiceImpl implements StatsService {
             List<Object[]> rawData = unique
                     ? statsRepository.findUniqueStats(startTime, endTime, uris)
                     : statsRepository.findStats(startTime, endTime, uris);
-            if(uris == null || uris.isEmpty()){
+            if (uris == null || uris.isEmpty()) {
                 rawData = unique
                         ? statsRepository.findUniqueStatsWithoutUris(startTime, endTime)
                         : statsRepository.findStatsWithoutUris(startTime, endTime);
