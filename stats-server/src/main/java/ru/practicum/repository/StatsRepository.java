@@ -12,22 +12,40 @@ import java.util.List;
 @Repository
 public interface StatsRepository extends JpaRepository<Hit, Long> {
 
-    @Query("SELECT h.app, h.uri, COUNT(h.ip) " +
+    @Query("SELECT h.app, h.uri, COUNT(h.ip) AS cnt " +
             "FROM Hit h " +
             "WHERE h.timeStamp BETWEEN :start AND :end " +
             "AND h.uri IN :uris " +
-            "GROUP BY h.app, h.uri")
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY cnt DESC")
     List<Object[]> findStats(@Param("start") LocalDateTime start,
                              @Param("end") LocalDateTime end,
                              @Param("uris") List<String> uris);
 
 
-    @Query("SELECT h.app, h.uri, COUNT(DISTINCT h.ip) " +
+    @Query("SELECT h.app, h.uri, COUNT(DISTINCT h.ip) AS cnt " +
             "FROM Hit h " +
             "WHERE h.timeStamp BETWEEN :start AND :end " +
             "AND h.uri IN :uris " +
-            "GROUP BY h.app, h.uri")
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY cnt DESC")
     List<Object[]> findUniqueStats(@Param("start") LocalDateTime start,
                                    @Param("end") LocalDateTime end,
                                    @Param("uris") List<String> uris);
+
+    @Query("SELECT h.app, h.uri, COUNT(h.ip) AS cnt " +
+            "FROM Hit h " +
+            "WHERE h.timeStamp BETWEEN :start AND :end " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY cnt DESC")
+    List<Object[]> findStatsWithoutUris(@Param("start") LocalDateTime start,
+                                        @Param("end") LocalDateTime end);
+
+    @Query("SELECT h.app, h.uri, COUNT(DISTINCT h.ip) AS cnt " +
+            "FROM Hit h " +
+            "WHERE h.timeStamp BETWEEN :start AND :end " +
+            "GROUP BY h.app, h.uri " +
+            "ORDER BY cnt DESC")
+    List<Object[]> findUniqueStatsWithoutUris(@Param("start") LocalDateTime start,
+                                              @Param("end") LocalDateTime end);
 }

@@ -21,10 +21,11 @@ import java.util.List;
 public class StatsServiceImpl implements StatsService {
 
     private final StatsRepository statsRepository;
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
 
     @Override
     public String createHit(RequestDto requestDto) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String ip = requestDto.getIp();
         String uri = requestDto.getUri();
 
@@ -50,13 +51,18 @@ public class StatsServiceImpl implements StatsService {
         log.info("Получен запрос статистики: start={}, end={}, uris={}, unique={}", start, end, uris, unique);
 
         try {
-
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime startTime = LocalDateTime.parse(start, formatter);
             LocalDateTime endTime = LocalDateTime.parse(end, formatter);
 
             List<Object[]> rawData = unique
                     ? statsRepository.findUniqueStats(startTime, endTime, uris)
                     : statsRepository.findStats(startTime, endTime, uris);
+            if(uris == null){
+                rawData = unique
+                        ? statsRepository.findUniqueStatsWithoutUris(startTime, endTime)
+                        : statsRepository.findStatsWithoutUris(startTime, endTime);
+            }
             List<StatsDto> stats = new ArrayList<>();
             for (Object[] row : rawData) {
                 String app = (String) row[0];
