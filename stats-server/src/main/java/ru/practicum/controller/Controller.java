@@ -1,6 +1,5 @@
 package ru.practicum.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -8,7 +7,6 @@ import ru.practicum.service.StatsService;
 import ru.practicum.statsdto.RequestDto;
 import ru.practicum.statsdto.StatsDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController

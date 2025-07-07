@@ -1,6 +1,5 @@
 package ru.practicum.service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.statsdto.RequestDto;
 import ru.practicum.statsdto.StatsDto;
