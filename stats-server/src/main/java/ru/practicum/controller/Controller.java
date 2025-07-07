@@ -18,14 +18,13 @@ public class Controller {
     private final StatsService statsService;
 
     @PostMapping("/hit")
-    public String createHit(@RequestBody RequestDto requestDto,
-                            HttpServletRequest request) {
-        return statsService.createHit(requestDto, request);
+    public String createHit(@RequestBody RequestDto requestDto) {
+        return statsService.createHit(requestDto);
     }
 
     @GetMapping("/stats")
-    public List<StatsDto> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                   @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+    public List<StatsDto> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String start,
+                                   @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") String end,
                                    @RequestParam(required = false) List<String> uris,
                                    @RequestParam(defaultValue = "false") boolean unique) {
 
