@@ -5,7 +5,7 @@ services:
     ports:
       - "9090:9090"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:6541/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1234
 
