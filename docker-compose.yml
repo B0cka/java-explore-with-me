@@ -14,6 +14,8 @@ services:
       - "6541:5432"
 
   ewm-service:
+    build:
+      context: ./stats-server
     ports:
       - "8080:8080"
 
