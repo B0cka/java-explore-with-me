@@ -22,6 +22,7 @@ public class StatsServiceImpl implements StatsService {
 
     private final StatsRepository statsRepository;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     @Override
     public String createHit(RequestDto requestDto) {
         String ip = requestDto.getIp();
