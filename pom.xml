@@ -12,7 +12,6 @@
 
 	<name>Explore With Me</name>
 	<modules>
-		<module>ewm-service</module>
 		<module>stats-server</module>
 		<module>stats-server/stats-client</module>
 		<module>stats-server/stats-dto</module>
