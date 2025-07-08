@@ -2,6 +2,7 @@
 package ru.practicum;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.statsdto.RequestDto;
@@ -16,15 +17,17 @@ public class StatsClient {
 
     RestTemplate restTemplate;
 
-    public String createHit(RequestDto requestDto) {
-        String statsServerUrl = "http://localhost:9090/hit";
+    @Value("${stats.server.url}")
+    String statsServerUrl;
 
-        return restTemplate.postForObject(statsServerUrl, requestDto, String.class);
+    public String createHit(RequestDto requestDto) {
+
+        return restTemplate.postForObject(statsServerUrl + "/hit", requestDto, String.class);
     }
 
     public List<StatsDto> getStats(String start, String end, List<String> uris, boolean unique) {
         StringBuilder statsServerUrl = new StringBuilder("http://localhost:9090/stats");
-        statsServerUrl.append("?start=" + start).append("&end=" + end).append("&unique=" + unique);
+        statsServerUrl.append("/stats?start=" + start).append("&end=" + end).append("&unique=" + unique);
         if (uris.size() != 0) {
             for (String q : uris) {
                 statsServerUrl.append("&uris=" + q);
