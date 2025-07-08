@@ -12,10 +12,9 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-
 public class StatsClient {
 
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
     @Value("${stats.server.url}")
     String statsServerUrl;
@@ -26,14 +25,14 @@ public class StatsClient {
     }
 
     public List<StatsDto> getStats(String start, String end, List<String> uris, boolean unique) {
-        StringBuilder statsServerUrl = new StringBuilder("http://localhost:9090/stats");
-        statsServerUrl.append("/stats?start=" + start).append("&end=" + end).append("&unique=" + unique);
+        StringBuilder statsServerUrls = new StringBuilder(statsServerUrl);
+        statsServerUrls.append("/stats?start=" + start).append("&end=" + end).append("&unique=" + unique);
         if (uris.size() != 0) {
             for (String q : uris) {
-                statsServerUrl.append("&uris=" + q);
+                statsServerUrls.append("&uris=" + q);
             }
         }
-        String finalURI = statsServerUrl.toString();
+        String finalURI = statsServerUrls.toString();
         StatsDto[] response = restTemplate.getForObject(finalURI, StatsDto[].class);
         return List.of(response);
     }
