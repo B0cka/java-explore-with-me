@@ -5,12 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class RequestDto {
+public class UserShortDto {
 
+    @Email
     @NotBlank
     private String email;
 
-    @Email
     @NotBlank
     private String name;
 

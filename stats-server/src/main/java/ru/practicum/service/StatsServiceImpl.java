@@ -25,7 +25,7 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public String createHit(RequestDto requestDto) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
         String ip = requestDto.getIp();
         String uri = requestDto.getUri();
 
@@ -69,11 +69,10 @@ public class StatsServiceImpl implements StatsService {
                 String uri = (String) row[1];
                 Long hits = (Long) row[2];
 
-                StatsDto dto = StatsDto.builder()
-                        .app(app)
-                        .uri(uri)
-                        .hits(hits)
-                        .build();
+                StatsDto dto = new StatsDto();
+                dto.setApp(app);
+                dto.setUri(uri);
+                dto.setHits(hits);
                 stats.add(dto);
             }
 
