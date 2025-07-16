@@ -135,7 +135,7 @@ public class EvenServiceImpl implements EventService {
         checkUser(userId);
         Event event = checkEvenByInitiatorAndEventId(userId, eventId);
 
-        if (!event.isRequestModeration() || event.getParticipantLimit() == 0) {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             throw new ConflictException("Это событие не требует подтверждения запросов");
         }
         RequestStatus status = inputUpdate.getStatus();

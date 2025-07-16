@@ -36,7 +36,7 @@ public class UserEventController {
     }
 
     @GetMapping("/{userId}/events")
-    public List<EventFullDto> getUserEvents(@PathVariable @Min(1) Long userId,
+    public List<EventFullDto> getUserEvents(@PathVariable(value = "userId") @Min(1) Long userId,
                                             @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                             @RequestParam(defaultValue = "10") @Min(1) Integer size, HttpServletRequest request) {
         statsClient.createHit(request);
