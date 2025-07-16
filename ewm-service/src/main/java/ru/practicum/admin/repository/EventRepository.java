@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.admin.model.Event;
 
 import org.springframework.data.domain.Pageable;
-import ru.practicum.admin.model.Request;
 
 import java.util.List;
 import java.util.Optional;

@@ -50,7 +50,7 @@ public class UserEventController {
     }
 
     @GetMapping("/{eventId}/requests")
-    public List<ParticipationRequestDto> getRequestsById(@PathVariable(value = "eventId") Long eventId, @PathVariable(value = "userId") Long userId, HttpServletRequest request){
+    public List<ParticipationRequestDto> getRequestsById(@PathVariable(value = "eventId") Long eventId, @PathVariable(value = "userId") Long userId, HttpServletRequest request) {
         statsClient.createHit(request);
         return eventService.getAllParticipationRequestsFromEventByOwner(userId, eventId);
     }
@@ -61,5 +61,5 @@ public class UserEventController {
                                                                        @RequestBody EventRequestStatusUpdateRequest inputUpdate) {
         return eventService.updateStatusRequest(userId, eventId, inputUpdate);
     }
-    
+
 }

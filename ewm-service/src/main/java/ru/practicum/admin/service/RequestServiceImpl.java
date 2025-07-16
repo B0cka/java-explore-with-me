@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class RequestServiceImpl implements RequestService{
+public class RequestServiceImpl implements RequestService {
 
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
@@ -100,7 +100,7 @@ public class RequestServiceImpl implements RequestService{
                 () -> new NotFoundException("Пользователя с id = " + userId + " не существует"));
     }
 
-    private Event checkEvent(Long eventId){
+    private Event checkEvent(Long eventId) {
         return eventRepository.findById(eventId).orElseThrow(
                 () -> new NotFoundException("Евента с id = " + eventId + " не существует"));
 

@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EvenServiceImpl implements EventService{
+public class EvenServiceImpl implements EventService {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
@@ -120,7 +120,7 @@ public class EvenServiceImpl implements EventService{
     }
 
     @Override
-    public EventFullDto getEventById(Long userId, Long eventId){
+    public EventFullDto getEventById(Long userId, Long eventId) {
         log.info("Получение событий для пользователя с id={}, eventId={}", userId, eventId);
         checkUser(userId);
 

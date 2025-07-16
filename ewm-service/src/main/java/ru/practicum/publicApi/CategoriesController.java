@@ -19,18 +19,19 @@ public class CategoriesController {
 
     private final StatsClient statsClient;
     private final PublicCategoriesService publicCategoriesService;
+
     @GetMapping
-    public List<CategoryDto> getAllCategories(@RequestParam(defaultValue = "0") @Min(0) Integer from, @RequestParam(defaultValue = "10") @Min(0) Integer size, HttpServletRequest request){
+    public List<CategoryDto> getAllCategories(@RequestParam(defaultValue = "0") @Min(0) Integer from, @RequestParam(defaultValue = "10") @Min(0) Integer size, HttpServletRequest request) {
 
         statsClient.createHit(request);
         return publicCategoriesService.getAllCategories(from, size);
     }
 
     @GetMapping("/{catId}")
-    public CategoryDto getCategoryById(@PathVariable("catId") Long id, HttpServletRequest request){
+    public CategoryDto getCategoryById(@PathVariable("catId") Long id, HttpServletRequest request) {
 
         statsClient.createHit(request);
-        return  publicCategoriesService.getCategoryById(id);
+        return publicCategoriesService.getCategoryById(id);
 
     }
 }

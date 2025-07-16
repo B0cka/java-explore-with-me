@@ -1,6 +1,5 @@
 package ru.practicum.publicApi.service;
 
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.users.dto.CategoryDto;
 
 import java.util.List;

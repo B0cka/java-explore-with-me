@@ -7,7 +7,7 @@ import ru.practicum.admin.model.Request;
 @UtilityClass
 public class RequestMapper {
 
-    public ParticipationRequestDto toDto(Request request){
+    public ParticipationRequestDto toDto(Request request) {
 
         return ParticipationRequestDto.builder()
                 .id(request.getId())

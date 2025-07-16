@@ -7,7 +7,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.admin.dto.NewCategoryDto;
-import ru.practicum.admin.dto.UpdateEventRequest;
 import ru.practicum.admin.exseptions.ConflictException;
 import ru.practicum.admin.exseptions.NotFoundException;
 import ru.practicum.admin.mapper.CategoryMapper;

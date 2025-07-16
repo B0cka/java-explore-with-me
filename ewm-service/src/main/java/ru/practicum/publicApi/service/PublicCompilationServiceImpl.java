@@ -17,17 +17,17 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PublicCompilationServiceImpl implements PublicCompilationService{
+public class PublicCompilationServiceImpl implements PublicCompilationService {
     private final CompilationRepository compilationRepository;
 
     @Override
-    public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size){
+    public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         log.info("Запрос на получение сборки с параметрами: pinned={}, from={}, size={}", pinned, from, size);
 
         Pageable pageable = (Pageable) PageRequest.of(from / size, size);
         List<Compilation> compilations = compilationRepository.findAllByPinned(pinned, pageable);
         List<CompilationDto> returned = new ArrayList<>();
-        for(Compilation c : compilations){
+        for (Compilation c : compilations) {
             returned.add(CompilationMapper.toCompilationDto(c));
         }
 
@@ -36,7 +36,7 @@ public class PublicCompilationServiceImpl implements PublicCompilationService{
     }
 
     @Override
-    public CompilationDto getById(Long id){
+    public CompilationDto getById(Long id) {
         log.info("Запрос на получение сборки с параметрами: id={}", id);
         Compilation compilation = compilationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Сборки по id: " + id + " не существует"));

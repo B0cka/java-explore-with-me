@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class AdminEventServiceImpl implements AdminEventService{
+public class AdminEventServiceImpl implements AdminEventService {
 
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;

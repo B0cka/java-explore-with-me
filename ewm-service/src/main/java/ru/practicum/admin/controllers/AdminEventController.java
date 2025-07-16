@@ -19,7 +19,7 @@ public class AdminEventController {
     private final AdminEventService adminEventService;
 
     @PatchMapping("/{requestId}")
-    public EventFullDto updateEventAndState(@PathVariable Long id, UpdateEventAdminRequest updateEventAdminRequest, HttpServletRequest request){
+    public EventFullDto updateEventAndState(@PathVariable Long id, UpdateEventAdminRequest updateEventAdminRequest, HttpServletRequest request) {
 
         statsClient.createHit(request);
         return adminEventService.updateEventAndState(id, updateEventAdminRequest);
@@ -34,7 +34,7 @@ public class AdminEventController {
                                         @RequestParam(required = false) String rangeStart,
                                         @RequestParam(required = false) String rangeEnd,
                                         @RequestParam(defaultValue = "0") Integer from,
-                                        @RequestParam(defaultValue = "10") Integer size){
+                                        @RequestParam(defaultValue = "10") Integer size) {
 
         statsClient.createHit(request);
         return adminEventService.getEvents(users, states, categories, rangeEnd, rangeStart, from, size);

@@ -17,8 +17,8 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PublicCategoryServiceImpl implements PublicCategoriesService{
-private final CategoryRepository categoryRepository;
+public class PublicCategoryServiceImpl implements PublicCategoriesService {
+    private final CategoryRepository categoryRepository;
 
     @Override
     public List<CategoryDto> getAllCategories(Integer from, Integer size) {
@@ -29,7 +29,7 @@ private final CategoryRepository categoryRepository;
         Page<Category> allEvents = categoryRepository.findAll(pageable);
         List<CategoryDto> returnList = new ArrayList<>();
 
-        for(Category c : allEvents){
+        for (Category c : allEvents) {
             returnList.add(CategoryMapper.toCategoryDto(c));
         }
 
@@ -37,11 +37,11 @@ private final CategoryRepository categoryRepository;
     }
 
     @Override
-    public CategoryDto getCategoryById(Long id){
+    public CategoryDto getCategoryById(Long id) {
         log.info("Получение категорий по id={}", id);
 
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Категории с id: " + id +" не существует"));
+                .orElseThrow(() -> new NotFoundException("Категории с id: " + id + " не существует"));
 
         return CategoryMapper.toCategoryDto(category);
     }

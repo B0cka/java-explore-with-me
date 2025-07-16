@@ -20,7 +20,7 @@ public class PublicComplicationsController {
 
     @GetMapping
     public List<CompilationDto> getCompilations(@RequestParam Boolean pinned, @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                                @RequestParam(defaultValue = "10") @Min(1) Integer size, HttpServletRequest request){
+                                                @RequestParam(defaultValue = "10") @Min(1) Integer size, HttpServletRequest request) {
 
         statsClient.createHit(request);
         return publicCompilationService.getCompilations(pinned, from, size);
@@ -28,7 +28,7 @@ public class PublicComplicationsController {
     }
 
     @GetMapping("/{comId}")
-    public CompilationDto getById(@PathVariable("comId") Long id, HttpServletRequest request){
+    public CompilationDto getById(@PathVariable("comId") Long id, HttpServletRequest request) {
         statsClient.createHit(request);
 
         return publicCompilationService.getById(id);
