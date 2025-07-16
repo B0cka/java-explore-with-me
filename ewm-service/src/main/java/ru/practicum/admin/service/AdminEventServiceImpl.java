@@ -70,7 +70,7 @@ public class AdminEventServiceImpl implements AdminEventService {
             }
 
         }
-        if(!r){
+        if (!r) {
             event.setEventStatus(EventStatus.PUBLISHED);
             event.setPublishedOn(LocalDateTime.now());
         }
