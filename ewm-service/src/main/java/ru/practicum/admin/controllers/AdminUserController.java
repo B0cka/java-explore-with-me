@@ -33,18 +33,17 @@ public class AdminUserController {
     }
 
     @GetMapping("/users")
-    public List<UserDto> getUsers(  @RequestParam(required = false) List<Long> ids,
-                                        @RequestParam(defaultValue = "0") @Min(0) Integer from,
-                                        @RequestParam(defaultValue = "10") @Positive Integer size,
-                                        HttpServletRequest request)
-    {
+    public List<UserDto> getUsers(@RequestParam(required = false) List<Long> ids,
+                                  @RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                  @RequestParam(defaultValue = "10") @Positive Integer size,
+                                  HttpServletRequest request) {
 
         statsClient.createHit(request);
         return userService.getUsers(ids, from, size);
     }
 
     @DeleteMapping("/users/{userId}")
-    public void deleteUser(@PathVariable("userId") Long id, HttpServletRequest request){
+    public void deleteUser(@PathVariable("userId") Long id, HttpServletRequest request) {
         statsClient.createHit(request);
         userService.deleteUser(id);
     }

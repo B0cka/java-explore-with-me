@@ -1,6 +1,7 @@
 package ru.practicum.admin.dto;
 
 import lombok.*;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -8,5 +9,6 @@ import lombok.*;
 public class UserShortDto {
 
     private Long id;
+
     private String name;
 }
