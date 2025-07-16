@@ -2,6 +2,7 @@ package ru.practicum.admin.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.StatsClient;
 import ru.practicum.admin.dto.EventFullDto;
@@ -10,6 +11,7 @@ import ru.practicum.admin.service.AdminEventService;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/admin/events")
 @RequiredArgsConstructor
@@ -18,9 +20,9 @@ public class AdminEventController {
     private final StatsClient statsClient;
     private final AdminEventService adminEventService;
 
-    @PatchMapping("/{requestId}")
-    public EventFullDto updateEventAndState(@PathVariable Long id, UpdateEventAdminRequest updateEventAdminRequest, HttpServletRequest request) {
-
+    @PatchMapping("/{id}")
+    public EventFullDto updateEventAndState(@PathVariable Long id, @RequestBody UpdateEventAdminRequest updateEventAdminRequest, HttpServletRequest request) {
+        log.info("dto={}", updateEventAdminRequest);
         statsClient.createHit(request);
         return adminEventService.updateEventAndState(id, updateEventAdminRequest);
 

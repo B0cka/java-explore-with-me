@@ -44,6 +44,8 @@ public class AdminEventServiceImpl implements AdminEventService {
 
         updateEventFields(event, updateEventAdminRequest);
 
+        Boolean r = false;
+
         if (updateEventAdminRequest.getStateAction() != null) {
 
             switch (updateEventAdminRequest.getStateAction()) {
@@ -55,6 +57,7 @@ public class AdminEventServiceImpl implements AdminEventService {
 
                     event.setEventStatus(EventStatus.PUBLISHED);
                     event.setPublishedOn(LocalDateTime.now());
+                    r = true;
                     break;
 
                 case EventStatus.CANCELED:
@@ -62,9 +65,14 @@ public class AdminEventServiceImpl implements AdminEventService {
                         throw new ConflictException("Нельзя отклонить уже опубликованное событие");
                     }
                     event.setEventStatus(EventStatus.CANCELED);
+                    r = true;
                     break;
             }
 
+        }
+        if(!r){
+            event.setEventStatus(EventStatus.PUBLISHED);
+            event.setPublishedOn(LocalDateTime.now());
         }
 
         Event updatedEvent = eventRepository.save(event);
