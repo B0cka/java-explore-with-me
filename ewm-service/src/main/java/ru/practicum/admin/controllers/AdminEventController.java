@@ -24,7 +24,7 @@ public class AdminEventController {
     public EventFullDto updateEventAndState(@PathVariable Long id, @RequestBody UpdateEventAdminRequest updateEventAdminRequest, HttpServletRequest request) {
         log.info("dto={}", updateEventAdminRequest);
         statsClient.createHit(request);
-        return adminEventService.updateEventAndState(id, updateEventAdminRequest);
+        return adminEventService.updateEventFromAdmin(id, updateEventAdminRequest);
 
     }
 

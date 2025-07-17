@@ -8,13 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import ru.practicum.admin.dto.EventFullDto;
-import ru.practicum.admin.dto.EventStatus;
-import ru.practicum.admin.dto.UpdateEventAdminRequest;
+import ru.practicum.admin.dto.*;
 import ru.practicum.admin.exseptions.ConflictException;
 import ru.practicum.admin.exseptions.NotFoundException;
 import ru.practicum.admin.mapper.EventMapper;
 import ru.practicum.admin.mapper.LocationMapper;
+import ru.practicum.admin.model.Category;
 import ru.practicum.admin.model.Event;
 import ru.practicum.admin.model.Location;
 import ru.practicum.admin.repository.CategoryRepository;
@@ -36,47 +35,44 @@ public class AdminEventServiceImpl implements AdminEventService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    @Transactional
-    public EventFullDto updateEventAndState(Long id, UpdateEventAdminRequest updateEventAdminRequest) {
-        log.info("Admin: Редактирование события id={}", id);
-
-        Event event = checkEvent(id);
-
-        updateEventFields(event, updateEventAdminRequest);
-
-        Boolean r = false;
-
-        if (updateEventAdminRequest.getStateAction() != null) {
-
-            switch (updateEventAdminRequest.getStateAction()) {
-                case EventStatus.PUBLISHED:
-
-                    if (!event.getEventStatus().equals(EventStatus.PENDING)) {
-                        throw new ConflictException("Событие должно быть в состоянии PENDING для публикации");
-                    }
-
-                    event.setEventStatus(EventStatus.PUBLISHED);
-                    event.setPublishedOn(LocalDateTime.now());
-                    r = true;
-                    break;
-
-                case EventStatus.CANCELED:
-                    if (event.getEventStatus().equals(EventStatus.PUBLISHED)) {
-                        throw new ConflictException("Нельзя отклонить уже опубликованное событие");
-                    }
-                    event.setEventStatus(EventStatus.CANCELED);
-                    r = true;
-                    break;
+    public EventFullDto updateEventFromAdmin(Long eventId, UpdateEventAdminRequest updateEvent) {
+        Event oldEvent = checkEvent(eventId);
+        if (oldEvent.getEventStatus().equals(EventStatus.PUBLISHED) || oldEvent.getEventStatus().equals(EventStatus.CANCELED)) {
+            throw new ConflictException("Можно изменить только неподтвержденное событие");
+        }
+        boolean hasChanges = false;
+        Event eventForUpdate = universalUpdate(oldEvent, updateEvent);
+        if (eventForUpdate == null) {
+            eventForUpdate = oldEvent;
+        } else {
+            hasChanges = true;
+        }
+        LocalDateTime gotEventDate = updateEvent.getEventDate();
+        if (gotEventDate != null) {
+            if (gotEventDate.isBefore(LocalDateTime.now().plusHours(1))) {
+                throw new ConflictException("Некорректные параметры даты.Дата начала " +
+                        "изменяемого события должна " + "быть не ранее чем за час от даты публикации.");
             }
-
-        }
-        if (!r) {
-            event.setEventStatus(EventStatus.PUBLISHED);
-            event.setPublishedOn(LocalDateTime.now());
+            eventForUpdate.setEventDate(updateEvent.getEventDate());
+            hasChanges = true;
         }
 
-        Event updatedEvent = eventRepository.save(event);
-        return EventMapper.toEventFullDto(updatedEvent);
+        EventUserState gotAction = updateEvent.getStateAction();
+        if (gotAction != null) {
+            if (EventUserState.PUBLISH_EVENT.equals(gotAction)) {
+                eventForUpdate.setEventStatus(EventStatus.PUBLISHED);
+                eventForUpdate.setPublishedOn(LocalDateTime.now());
+                hasChanges = true;
+            } else if (EventUserState.REJECT_EVENT.equals(gotAction)) {
+                eventForUpdate.setEventStatus(EventStatus.CANCELED);
+                hasChanges = true;
+            }
+        }
+        Event eventAfterUpdate = null;
+        if (hasChanges) {
+            eventAfterUpdate = eventRepository.save(eventForUpdate);
+        }
+        return eventAfterUpdate != null ? EventMapper.toEventFullDto(eventAfterUpdate) : null;
     }
 
     @Override
@@ -121,36 +117,55 @@ public class AdminEventServiceImpl implements AdminEventService {
                 .collect(Collectors.toList());
     }
 
-    private void updateEventFields(Event event, UpdateEventAdminRequest update) {
-        if (update.getAnnotation() != null && !update.getAnnotation().isBlank()) {
-            event.setAnnotation(update.getAnnotation());
+    private Event universalUpdate(Event oldEvent, UpdateEventRequest updateEvent) {
+        boolean hasChanges = false;
+        String gotAnnotation = updateEvent.getAnnotation();
+        if (gotAnnotation != null && !gotAnnotation.isBlank()) {
+            oldEvent.setAnnotation(gotAnnotation);
+            hasChanges = true;
         }
-        if (update.getCategory() != null) {
-            event.setCategory(categoryRepository.findById(update.getCategory())
-                    .orElseThrow(() -> new NotFoundException("Категория не найдена")));
+        Long gotCategory = updateEvent.getCategory();
+        if (gotCategory != null) {
+            Category category = categoryRepository.findById(gotCategory)
+                            .orElseThrow(() -> new NotFoundException("ТАкой категории не существует"));
+
+            oldEvent.setCategory(category);
+            hasChanges = true;
         }
-        if (update.getDescription() != null && !update.getDescription().isBlank()) {
-            event.setDescription(update.getDescription());
+        String gotDescription = updateEvent.getDescription();
+        if (gotDescription != null && !gotDescription.isBlank()) {
+            oldEvent.setDescription(gotDescription);
+            hasChanges = true;
         }
-        if (update.getEventDate() != null) {
-            event.setEventDate(update.getEventDate());
+        if (updateEvent.getLocation() != null) {
+            Location location = LocationMapper.toLocation(updateEvent.getLocation());
+            oldEvent.setLocation(location);
+            hasChanges = true;
         }
-        if (update.getLocation() != null) {
-            Location location = locationRepository.save(LocationMapper.toLocation(update.getLocation()));
-            event.setLocation(location);
+        Integer gotParticipantLimit = updateEvent.getParticipantLimit();
+        if (gotParticipantLimit != null) {
+            oldEvent.setParticipantLimit(gotParticipantLimit);
+            hasChanges = true;
         }
-        if (update.getPaid() != null) {
-            event.setPaid(update.getPaid());
+        if (updateEvent.getPaid() != null) {
+            oldEvent.setPaid(updateEvent.getPaid());
+            hasChanges = true;
         }
-        if (update.getParticipantLimit() != null) {
-            event.setParticipantLimit(update.getParticipantLimit());
+        Boolean requestModeration = updateEvent.getRequestModeration();
+        if (requestModeration != null) {
+            oldEvent.setRequestModeration(requestModeration);
+            hasChanges = true;
         }
-        if (update.getRequestModeration() != null) {
-            event.setRequestModeration(update.getRequestModeration());
+        String gotTitle = updateEvent.getTitle();
+        if (gotTitle != null && !gotTitle.isBlank()) {
+            oldEvent.setTitle(gotTitle);
+            hasChanges = true;
         }
-        if (update.getTitle() != null && !update.getTitle().isBlank()) {
-            event.setTitle(update.getTitle());
+        if (!hasChanges) {
+
+            oldEvent = null;
         }
+        return oldEvent;
     }
 
     private Event checkEvent(Long eventId) {
