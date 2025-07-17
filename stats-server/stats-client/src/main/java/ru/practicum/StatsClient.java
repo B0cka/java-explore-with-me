@@ -3,6 +3,7 @@ package ru.practicum;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.statsdto.RequestDto;
@@ -13,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
+@Slf4j
 public class StatsClient {
 
     private final RestTemplate restTemplate;
@@ -25,21 +27,21 @@ public class StatsClient {
 
     public String createHit(HttpServletRequest request) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
-//        RequestDto requestDto = RequestDto.builder()
-//                .ip(request.getRemoteAddr())
-//                .app("ewm-main-service")
-//                .uri(request.getRequestURI())
-//                .timestamp(LocalDateTime.now().toString())
-//                .build();
 
         RequestDto requestDto = new RequestDto();
-        requestDto.setApp(request.getRemoteAddr());
+        requestDto.setApp("ewm-main-service");
         requestDto.setIp(request.getRemoteAddr());
         requestDto.setUri(request.getRequestURI());
         requestDto.setTimestamp(LocalDateTime.now().format(formatter));
 
-        return restTemplate.postForObject(statsServerUrl + "/hit", requestDto, String.class);
+        try {
+            return restTemplate.postForObject(statsServerUrl + "/hit", requestDto, String.class);
+        } catch (Exception e) {
+            log.info("Stats service unavailable: {}", e.getMessage());
+            return null;
+        }
     }
+
 
     public List<StatsDto> getStats(String start, String end, List<String> uris, boolean unique) {
         StringBuilder statsServerUrls = new StringBuilder(statsServerUrl);
