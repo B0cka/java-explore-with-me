@@ -273,6 +273,7 @@ public class EvenServiceImpl implements EventService {
                 throw new ConflictException("Некорректный статус - " + status);
         }
     }
+
     @Override
     public List<ParticipationRequestDto> getAllParticipationRequestsFromEventByOwner(Long userId, Long eventId) {
         checkUser(userId);
