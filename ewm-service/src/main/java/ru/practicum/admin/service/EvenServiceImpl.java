@@ -1,7 +1,11 @@
 package ru.practicum.admin.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+import ru.practicum.StatsClient;
 import ru.practicum.admin.dto.*;
 import ru.practicum.admin.exseptions.ConflictException;
 import ru.practicum.admin.mapper.LocationMapper;
@@ -14,10 +18,11 @@ import ru.practicum.admin.mapper.EventMapper;
 import ru.practicum.admin.repository.*;
 
 import org.springframework.data.domain.Pageable;
+import ru.practicum.statsdto.StatsDto;
+
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +35,11 @@ public class EvenServiceImpl implements EventService {
     private final LocationRepository locationRepository;
     private final EventRepository eventRepository;
     private final RequestRepository requestRepository;
+    private final StatsClient statsClient;
+
+    @Value("${server.application.name:ewm-service}")
+    private String applicationName;
+
 
     @Override
     public EventFullDto addNewEvent(Long userId, NewEventDto eventDto) {
@@ -120,6 +130,67 @@ public class EvenServiceImpl implements EventService {
     }
 
     @Override
+    public List<EventShortDto> getAllEventFromPublic(SearchEventParams searchEventParams, HttpServletRequest request) {
+
+        if (searchEventParams.getRangeEnd() != null && searchEventParams.getRangeStart() != null) {
+            if (searchEventParams.getRangeEnd().isBefore(searchEventParams.getRangeStart())) {
+                throw new ConflictException("Дата окончания не может быть раньше даты начала");
+            }
+        }
+
+        addStatsClient(request);
+
+        Pageable pageable = PageRequest.of(searchEventParams.getFrom() / searchEventParams.getSize(),
+                searchEventParams.getSize());
+
+        Specification<Event> specification = Specification.where(null);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (searchEventParams.getText() != null) {
+            String searchText = searchEventParams.getText().toLowerCase();
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.or(
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("annotation")), "%" + searchText + "%"),
+                            criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), "%" + searchText + "%")
+                    ));
+        }
+
+        if (searchEventParams.getCategories() != null && !searchEventParams.getCategories().isEmpty()) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    root.get("category").get("id").in(searchEventParams.getCategories()));
+        }
+
+        LocalDateTime startDateTime = Objects.requireNonNullElse(searchEventParams.getRangeStart(), now);
+        specification = specification.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.greaterThan(root.get("eventDate"), startDateTime));
+
+        if (searchEventParams.getRangeEnd() != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThan(root.get("eventDate"), searchEventParams.getRangeEnd()));
+        }
+
+        if (searchEventParams.getOnlyAvailable() != null) {
+            specification = specification.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("participantLimit"), 0));
+        }
+
+        specification = specification.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("eventStatus"), EventStatus.PUBLISHED));
+
+        List<Event> resultEvents = eventRepository.findAll(specification, pageable).getContent();
+        List<EventShortDto> result = resultEvents
+                .stream().map(EventMapper::toEventShortDto).collect(Collectors.toList());
+        Map<Long, Long> viewStatsMap = getViewsAllEvents(resultEvents);
+
+        for (EventShortDto event : result) {
+            Long viewsFromMap = viewStatsMap.getOrDefault(event.getId(), 0L);
+            event.setViews(viewsFromMap);
+        }
+
+        return result;
+    }
+
+    @Override
     public EventFullDto getEventById(Long userId, Long eventId) {
         log.info("Получение событий для пользователя с id={}, eventId={}", userId, eventId);
         checkUser(userId);
@@ -127,6 +198,22 @@ public class EvenServiceImpl implements EventService {
         Event event = checkEvenByInitiatorAndEventId(userId, eventId);
 
         return EventMapper.toEventFullDto(event);
+    }
+
+    @Override
+    public EventFullDto getEventByIdPublic(Long eventId, HttpServletRequest request) {
+        log.info("Получение события с id={}", eventId);
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено"));
+        if (!event.getEventStatus().equals(EventStatus.PUBLISHED)) {
+            throw new NotFoundException("Событие с id = " + eventId + " не опубликовано");
+        }
+        addStatsClient(request);
+        EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
+        Map<Long, Long> viewStatsMap = getViewsAllEvents(List.of(event));
+        Long views = viewStatsMap.getOrDefault(event.getId(), 0L);
+        eventFullDto.setViews(views);
+        return eventFullDto;
     }
 
     @Override
@@ -186,7 +273,6 @@ public class EvenServiceImpl implements EventService {
                 throw new ConflictException("Некорректный статус - " + status);
         }
     }
-
     @Override
     public List<ParticipationRequestDto> getAllParticipationRequestsFromEventByOwner(Long userId, Long eventId) {
         checkUser(userId);
@@ -258,6 +344,39 @@ public class EvenServiceImpl implements EventService {
     private Category checkCategory(Long catId) {
         return categoryRepository.findById(catId).orElseThrow(
                 () -> new NotFoundException("Категории с id = " + catId + " не существует"));
+    }
+
+    private void addStatsClient(HttpServletRequest request) {
+        statsClient.createHit(request);
+
+    }
+
+    private Map<Long, Long> getViewsAllEvents(List<Event> events) {
+        List<String> uris = events.stream()
+                .map(event -> String.format("/events/%s", event.getId()))
+                .collect(Collectors.toList());
+
+        LocalDateTime earliestDate = events.stream()
+                .map(Event::getCreatedDate)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        Map<Long, Long> viewStatsMap = new HashMap<>();
+
+        if (earliestDate != null) {
+
+
+            List<StatsDto> viewStatsList = statsClient.getStats(earliestDate.toString(), LocalDateTime.now().toString(), uris, true);
+
+            viewStatsMap = viewStatsList.stream()
+                    .filter(statsDto -> statsDto.getUri().startsWith("/events/"))
+                    .collect(Collectors.toMap(
+                            statsDto -> Long.parseLong(statsDto.getUri().substring("/events/".length())),
+                            StatsDto::getHits
+                    ));
+        }
+
+        return viewStatsMap;
     }
 
     private User checkUser(Long userId) {
