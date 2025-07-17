@@ -18,7 +18,7 @@ services:
       - ewm-db
       - stats-server
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ewmService
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=1234
       - stats.server.url=http://stats-server:9090
@@ -32,11 +32,3 @@ services:
     ports:
       - "5434:5432"
 
-  ewm-db:
-    image: postgres:16.1
-    environment:
-      POSTGRES_PASSWORD=1234
-      POSTGRES_USER=postgres
-      POSTGRES_DB=ewmService
-    ports:
-      - "5433:5432"  # Проброс порта для локального доступа на 5433
