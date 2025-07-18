@@ -342,7 +342,7 @@ public class EvenServiceImpl implements EventService {
 
     private void checkDateAndTime(LocalDateTime time, LocalDateTime dateTime) {
         if (dateTime.isBefore(time.plusHours(2))) {
-            throw new DateTimeException("Поле должно содержать дату, которая еще не наступила.");
+            throw new BadRequestException("Поле должно содержать дату, которая еще не наступила.");
         }
     }
 

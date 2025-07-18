@@ -51,16 +51,18 @@ public class AdminEventServiceImpl implements AdminEventService {
         LocalDateTime gotEventDate = updateEvent.getEventDate();
         if (gotEventDate != null) {
             if (gotEventDate.isBefore(LocalDateTime.now().plusHours(1))) {
-                throw new ConflictException("Некорректные параметры даты.Дата начала " +
-                        "изменяемого события должна " + "быть не ранее чем за час от даты публикации.");
+                throw new ConflictException("Дата начала события должна быть не ранее чем за час от даты публикации.");
             }
-            eventForUpdate.setEventDate(updateEvent.getEventDate());
+            eventForUpdate.setEventDate(gotEventDate);
             hasChanges = true;
         }
 
         EventUserState gotAction = updateEvent.getStateAction();
         if (gotAction != null) {
             if (EventUserState.PUBLISH_EVENT.equals(gotAction)) {
+                if (!oldEvent.getEventStatus().equals(EventStatus.PENDING)) {
+                    throw new ConflictException("Публиковать можно только события в статусе ожидания.");
+                }
                 eventForUpdate.setEventStatus(EventStatus.PUBLISHED);
                 eventForUpdate.setPublishedOn(LocalDateTime.now());
                 hasChanges = true;
@@ -69,6 +71,7 @@ public class AdminEventServiceImpl implements AdminEventService {
                 hasChanges = true;
             }
         }
+
         Event eventAfterUpdate = null;
         if (hasChanges) {
             eventAfterUpdate = eventRepository.save(eventForUpdate);
