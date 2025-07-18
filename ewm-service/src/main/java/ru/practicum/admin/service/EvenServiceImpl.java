@@ -289,7 +289,7 @@ public class EvenServiceImpl implements EventService {
         checkUser(userId);
         checkEvenByInitiatorAndEventId(userId, eventId);
         List<Request> requests = requestRepository.findAllByEventId(eventId);
-        for(Request r : requests){
+        for (Request r : requests) {
             r.setCreated(r.getCreated().truncatedTo(ChronoUnit.MICROS));
         }
         return requests.stream().map(RequestMapper::toParticipationRequestDto).collect(Collectors.toList());
