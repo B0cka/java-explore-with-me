@@ -23,7 +23,6 @@ import ru.practicum.admin.repository.EventRepository;
 import ru.practicum.admin.repository.LocationRepository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
