@@ -1,6 +1,5 @@
 package ru.practicum.admin.dto;
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,7 @@ import java.util.List;
 public class NewCompilationDto {
     private List<Long> events;
     private Boolean pinned = false;
-    @NotNull
+
     @Size(min = 1, max = 50)
     private String title;
 }

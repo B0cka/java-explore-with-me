@@ -32,7 +32,7 @@ public class CompilationServiceImpl implements CompilationService {
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
         }
-        if (newCompilationDto.getTitle().isBlank()) {
+        if (newCompilationDto.getTitle().isBlank() || newCompilationDto.getTitle() == null) {
             throw new BadRequestException("Title не может состоять из пробелов");
         }
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
