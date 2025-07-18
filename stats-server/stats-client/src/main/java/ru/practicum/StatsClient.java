@@ -43,18 +43,27 @@ public class StatsClient {
     }
 
 
-    public List<StatsDto> getStats(String start, String end, List<String> uris, boolean unique) {
+    public List<StatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, boolean unique) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        String startStr = start.format(formatter);
+        String endStr = end.format(formatter);
+
         StringBuilder statsServerUrls = new StringBuilder(statsServerUrl);
-        statsServerUrls.append("/stats?start=" + start).append("&end=" + end).append("&unique=" + unique);
-        if (uris.size() != 0) {
+        statsServerUrls.append("/stats?start=" + startStr)
+                .append("&end=" + endStr)
+                .append("&unique=" + unique);
+
+        if (uris != null && !uris.isEmpty()) {
             for (String q : uris) {
                 statsServerUrls.append("&uris=" + q);
             }
         }
-        String finalURI = statsServerUrls.toString();
-        StatsDto[] response = restTemplate.getForObject(finalURI, StatsDto[].class);
+
+        StatsDto[] response = restTemplate.getForObject(statsServerUrls.toString(), StatsDto[].class);
         return List.of(response);
     }
+
 }
 
 

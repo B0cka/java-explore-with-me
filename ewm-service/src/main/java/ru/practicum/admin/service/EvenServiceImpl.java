@@ -374,7 +374,7 @@ public class EvenServiceImpl implements EventService {
 
         if (earliestDate != null) {
 
-            List<StatsDto> viewStatsList = statsClient.getStats(earliestDate.toString(), LocalDateTime.now().toString(), uris, true);
+            List<StatsDto> viewStatsList = statsClient.getStats(earliestDate, LocalDateTime.now(), uris, true);
 
             viewStatsMap = viewStatsList.stream()
                     .filter(statsDto -> statsDto.getUri().startsWith("/events/"))
