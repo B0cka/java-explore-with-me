@@ -18,6 +18,7 @@ import ru.practicum.admin.repository.RequestRepository;
 import ru.practicum.admin.repository.UserRepository;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,7 +59,7 @@ public class RequestServiceImpl implements RequestService {
         Request request = Request.builder()
                 .requester(checkUser(userId))
                 .event(event)
-                .created(LocalDateTime.now())
+                .created(LocalDateTime.now().truncatedTo(ChronoUnit.MICROS))
                 .status(event.getRequestModeration() ? RequestStatus.PENDING : RequestStatus.CONFIRMED)
                 .build();
 
