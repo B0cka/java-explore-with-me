@@ -1,6 +1,7 @@
 package ru.practicum.admin.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class AdminEventController {
     private final AdminEventService adminEventService;
 
     @PatchMapping("/{id}")
-    public EventFullDto updateEventAndState(@PathVariable Long id, @RequestBody UpdateEventAdminRequest updateEventAdminRequest, HttpServletRequest request) {
+    public EventFullDto updateEventAndState(@PathVariable Long id, @RequestBody @Valid UpdateEventAdminRequest updateEventAdminRequest, HttpServletRequest request) {
         log.info("dto={}", updateEventAdminRequest);
         statsClient.createHit(request);
         return adminEventService.updateEventFromAdmin(id, updateEventAdminRequest);
