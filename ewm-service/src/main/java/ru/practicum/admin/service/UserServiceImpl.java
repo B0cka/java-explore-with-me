@@ -6,7 +6,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.admin.dto.NewUserRequest;
 import ru.practicum.admin.dto.UserDto;
-import ru.practicum.admin.exseptions.BadRequestException;
 import ru.practicum.admin.exseptions.ConflictException;
 import ru.practicum.admin.exseptions.NotFoundException;
 import ru.practicum.admin.mapper.UserMapper;
