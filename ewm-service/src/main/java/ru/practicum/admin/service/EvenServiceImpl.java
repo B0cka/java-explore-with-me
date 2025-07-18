@@ -358,7 +358,6 @@ public class EvenServiceImpl implements EventService {
 
     private void addStatsClient(HttpServletRequest request) {
         statsClient.createHit(request);
-
     }
 
     private Map<Long, Long> getViewsAllEvents(List<Event> events) {
@@ -374,7 +373,6 @@ public class EvenServiceImpl implements EventService {
         Map<Long, Long> viewStatsMap = new HashMap<>();
 
         if (earliestDate != null) {
-
 
             List<StatsDto> viewStatsList = statsClient.getStats(earliestDate.toString(), LocalDateTime.now().toString(), uris, true);
 

@@ -10,7 +10,7 @@ public class StatsClientConfig {
 
     @Bean
     public StatsClient statsClient(RestTemplate restTemplate,
-                                   @Value("${stats.server.url:http://localhost:9090}") String statsServerUrl) {
+                                   @Value("${stats.server.url}") String statsServerUrl) {
         return new StatsClient(restTemplate, statsServerUrl);
     }
 }

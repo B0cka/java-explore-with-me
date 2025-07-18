@@ -21,7 +21,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=1234
-      - stats.server.url=http://stats-server:9090
+      - SERVICES_STATS_SERVICE_URI=http://stats-server:9090
       - SERVER_PORT=8080
 
   db:
