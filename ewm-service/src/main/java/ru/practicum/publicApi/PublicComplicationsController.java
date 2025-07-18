@@ -19,7 +19,7 @@ public class PublicComplicationsController {
     private final PublicCompilationService publicCompilationService;
 
     @GetMapping
-    public List<CompilationDto> getCompilations(@RequestParam Boolean pinned, @RequestParam(defaultValue = "0") @Min(0) Integer from,
+    public List<CompilationDto> getCompilations(@RequestParam(required = false) Boolean pinned, @RequestParam(defaultValue = "0") @Min(0) Integer from,
                                                 @RequestParam(defaultValue = "10") @Min(1) Integer size, HttpServletRequest request) {
 
         statsClient.createHit(request);
