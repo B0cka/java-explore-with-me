@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.admin.dto.NewUserRequest;
 import ru.practicum.admin.dto.UserDto;
+import ru.practicum.admin.exseptions.BadRequestException;
 import ru.practicum.admin.exseptions.NotFoundException;
 import ru.practicum.admin.mapper.UserMapper;
 import ru.practicum.admin.model.User;
@@ -27,9 +28,14 @@ public class UserServiceImpl implements UserService {
         String email = newUserRequest.getEmail();
         log.info("Создание пользователя с email={}, name={}", email, name);
 
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new BadRequestException("Данная почта уже занята");
+        }
+
         User user = userRepository.save(UserMapper.toUser(newUserRequest));
         return UserMapper.toUserDto(user);
     }
+
 
     @Override
     public List<UserDto> getUsers(List<Long> ids, Integer from, Integer size) {
