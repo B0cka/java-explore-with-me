@@ -51,7 +51,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         LocalDateTime gotEventDate = updateEvent.getEventDate();
         if (gotEventDate != null) {
             if (gotEventDate.isBefore(LocalDateTime.now().plusHours(1))) {
-                throw new ConflictException("Дата начала события должна быть не ранее чем за час от даты публикации.");
+                throw new BadRequestException("Дата начала события должна быть не ранее чем за час от даты публикации.");
             }
             eventForUpdate.setEventDate(gotEventDate);
             hasChanges = true;
