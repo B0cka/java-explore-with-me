@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.admin.dto.CompilationDto;
 import ru.practicum.admin.dto.NewCompilationDto;
+import ru.practicum.admin.exseptions.BadRequestException;
 import ru.practicum.admin.exseptions.NotFoundException;
 import ru.practicum.admin.mapper.CompilationMapper;
 import ru.practicum.admin.model.Compilation;
@@ -31,7 +32,9 @@ public class CompilationServiceImpl implements CompilationService {
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
         }
-
+        if (newCompilationDto.getTitle().isBlank()) {
+            throw new BadRequestException("Title не может состоять из пробелов");
+        }
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);
         compilation.setEvents(events);
 

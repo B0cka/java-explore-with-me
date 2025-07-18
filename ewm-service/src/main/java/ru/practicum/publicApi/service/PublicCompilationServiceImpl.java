@@ -22,6 +22,9 @@ public class PublicCompilationServiceImpl implements PublicCompilationService {
 
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
+        if(pinned == null) {
+            pinned = false;
+        }
         log.info("Запрос на получение сборки с параметрами: pinned={}, from={}, size={}", pinned, from, size);
 
         Pageable pageable = (Pageable) PageRequest.of(from / size, size);
