@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.StatsClient;
 import ru.practicum.admin.dto.EventFullDto;
@@ -31,11 +32,12 @@ public class AdminEventController {
     }
 
     @GetMapping
-    public List<EventFullDto> getEvents(HttpServletRequest request,
-                                        @Valid SearchEventParamsAdmin params) {
+    public ResponseEntity<List<EventFullDto>> getEvents(HttpServletRequest request,
+                                                        @Valid SearchEventParamsAdmin params) {
 
         statsClient.createHit(request);
-        return adminEventService.getEvents(params);
+        List<EventFullDto> list =adminEventService.getEvents(params);
+        return ResponseEntity.ok(list != null ? list : List.of());
     }
 
 }
