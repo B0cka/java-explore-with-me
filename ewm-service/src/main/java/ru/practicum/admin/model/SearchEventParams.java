@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class SearchEventParams {
     private String text;
 
-    private List<String> categories;
+    private List<Long> categories;
 
     private Boolean paid;
 
@@ -38,11 +38,4 @@ public class SearchEventParams {
     @Positive
     private Integer size = 10;
 
-    public List<Long> getParsedCategories() {
-        if (categories == null) return null;
-        return categories.stream()
-                .filter(Objects::nonNull)
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-    }
 }
