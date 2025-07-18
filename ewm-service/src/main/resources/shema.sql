@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS events (
     paid BOOLEAN DEFAULT FALSE,
     participant_limit INTEGER DEFAULT 0 NOT NULL,
     request_moderation BOOLEAN DEFAULT TRUE NOT NULL,
-    title VARCHAR(120) NOT NULL,
+    title VARCHAR(1200) NOT NULL,
     state VARCHAR(20) NOT NULL,
     views BIGINT DEFAULT 0,
     published_on TIMESTAMP WITHOUT TIME ZONE
