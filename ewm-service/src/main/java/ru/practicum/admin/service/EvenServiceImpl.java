@@ -205,16 +205,25 @@ public class EvenServiceImpl implements EventService {
         log.info("Получение события с id={}", eventId);
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("Событие с id = " + eventId + " не найдено"));
+
         if (!event.getEventStatus().equals(EventStatus.PUBLISHED)) {
             throw new NotFoundException("Событие с id = " + eventId + " не опубликовано");
         }
-        addStatsClient(request);
+
         EventFullDto eventFullDto = EventMapper.toEventFullDto(event);
-        Map<Long, Long> viewStatsMap = getViewsAllEvents(List.of(event));
-        Long views = viewStatsMap.getOrDefault(event.getId(), 0L);
-        eventFullDto.setViews(views);
+        try {
+            addStatsClient(request);
+            Map<Long, Long> viewStatsMap = getViewsAllEvents(List.of(event));
+            Long views = viewStatsMap.getOrDefault(event.getId(), 0L);
+            eventFullDto.setViews(views);
+        } catch (Exception e) {
+            log.warn("Не удалось получить статистику просмотров: {}", e.getMessage());
+            eventFullDto.setViews(0L);
+        }
+
         return eventFullDto;
     }
+
 
     @Override
     public EventRequestStatusUpdateResult updateStatusRequest(Long userId, Long eventId,

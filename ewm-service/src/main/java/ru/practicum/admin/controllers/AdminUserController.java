@@ -29,7 +29,6 @@ public class AdminUserController {
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
     public UserDto createUser(@Valid @RequestBody NewUserRequest newUserRequest, HttpServletRequest request) {
-        log.info("------------------------------------------------ newRequestUSer={}", newUserRequest);
         statsClient.createHit(request);
         return userService.createUser(newUserRequest);
     }
@@ -45,6 +44,7 @@ public class AdminUserController {
     }
 
     @DeleteMapping("/users/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable("userId") Long id, HttpServletRequest request) {
         statsClient.createHit(request);
         userService.deleteUser(id);
