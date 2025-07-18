@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.StatsClient;
 import ru.practicum.admin.dto.EventFullDto;
 import ru.practicum.admin.dto.UpdateEventAdminRequest;
+import ru.practicum.admin.model.SearchEventParamsAdmin;
 import ru.practicum.admin.service.AdminEventService;
 
 import java.util.List;
@@ -31,16 +32,10 @@ public class AdminEventController {
 
     @GetMapping
     public List<EventFullDto> getEvents(HttpServletRequest request,
-                                        @RequestParam(required = false) List<Long> users,
-                                        @RequestParam(required = false) List<String> states,
-                                        @RequestParam(required = false) List<Long> categories,
-                                        @RequestParam(required = false) String rangeStart,
-                                        @RequestParam(required = false) String rangeEnd,
-                                        @RequestParam(defaultValue = "0") Integer from,
-                                        @RequestParam(defaultValue = "10") Integer size) {
+                                        @Valid SearchEventParamsAdmin params) {
 
         statsClient.createHit(request);
-        return adminEventService.getEvents(users, states, categories, rangeEnd, rangeStart, from, size);
+        return adminEventService.getEvents(params);
     }
 
 }

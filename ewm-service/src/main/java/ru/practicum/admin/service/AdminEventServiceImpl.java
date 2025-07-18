@@ -17,6 +17,7 @@ import ru.practicum.admin.mapper.LocationMapper;
 import ru.practicum.admin.model.Category;
 import ru.practicum.admin.model.Event;
 import ru.practicum.admin.model.Location;
+import ru.practicum.admin.model.SearchEventParamsAdmin;
 import ru.practicum.admin.repository.CategoryRepository;
 import ru.practicum.admin.repository.EventRepository;
 import ru.practicum.admin.repository.LocationRepository;
@@ -81,38 +82,35 @@ public class AdminEventServiceImpl implements AdminEventService {
 
     @Override
     @Transactional
-    public List<EventFullDto> getEvents(List<Long> users, List<String> states, List<Long> categories, String rangeEnd, String rangeStart, Integer from, Integer size) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        log.info("Получение евентов по параметрам: usersId={}, states={}, categories={}, rangeEnd={}, rangeStart={}, from={}, size={}", users, states, categories, rangeEnd, rangeStart,
-                from,
-                size);
-
-        LocalDateTime start = rangeStart != null ?
-                LocalDateTime.parse(rangeStart, dateTimeFormatter) :
-                LocalDateTime.now();
-        LocalDateTime end = rangeEnd != null ?
-                LocalDateTime.parse(rangeEnd, dateTimeFormatter) :
-                null;
-
+    public List<EventFullDto> getEvents(SearchEventParamsAdmin params) {
         Specification<Event> spec = Specification.where(null);
 
-        if (users != null && !users.isEmpty()) {
-            spec = spec.and((root, query, cb) -> root.get("initiator").get("id").in(users));
-        }
-        if (states != null && !states.isEmpty()) {
-            spec = spec.and((root, query, cb) -> root.get("eventStatus").as(String.class).in(states));
-        }
-        if (categories != null && !categories.isEmpty()) {
-            spec = spec.and((root, query, cb) -> root.get("category").get("id").in(categories));
-        }
-        if (rangeStart != null) {
-            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("eventDate"), start));
-        }
-        if (rangeEnd != null) {
-            spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("eventDate"), end));
+        if (params.getUsers() != null && !params.getUsers().isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    root.get("initiator").get("id").in(params.getUsers()));
         }
 
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("eventDate").descending());
+        if (params.getStates() != null && !params.getStates().isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    root.get("eventStatus").as(String.class).in(params.getStates()));
+        }
+
+        if (params.getCategories() != null && !params.getCategories().isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    root.get("category").get("id").in(params.getCategories()));
+        }
+
+        if (params.getRangeStart() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("eventDate"), params.getRangeStart()));
+        }
+
+        if (params.getRangeEnd() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("eventDate"), params.getRangeEnd()));
+        }
+
+        Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize(), Sort.by("eventDate").descending());
 
         List<Event> events = eventRepository.findAll(spec, pageable).getContent();
 
