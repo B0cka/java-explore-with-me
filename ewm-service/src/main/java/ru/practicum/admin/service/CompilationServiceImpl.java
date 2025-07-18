@@ -28,11 +28,14 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
         log.info("Создание сборки со значениями dto={}", newCompilationDto);
+        if (newCompilationDto.getTitle() == null) {
+            throw new BadRequestException("Title не может быть null");
+        }
         Set<Event> events = new HashSet<>();
         if (newCompilationDto.getEvents() != null && !newCompilationDto.getEvents().isEmpty()) {
             events = new HashSet<>(eventRepository.findAllById(newCompilationDto.getEvents()));
         }
-        if (newCompilationDto.getTitle().isBlank() || newCompilationDto.getTitle() == null) {
+        if (newCompilationDto.getTitle().isBlank()) {
             throw new BadRequestException("Title не может состоять из пробелов");
         }
         Compilation compilation = CompilationMapper.toCompilation(newCompilationDto);

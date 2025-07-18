@@ -4,6 +4,8 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.admin.dto.ParticipationRequestDto;
 import ru.practicum.admin.model.Request;
 
+import java.time.temporal.ChronoUnit;
+
 @UtilityClass
 public class RequestMapper {
 
@@ -24,9 +26,10 @@ public class RequestMapper {
         return ParticipationRequestDto.builder()
                 .id(request.getId())
                 .event(request.getEvent().getId())
-                .created(request.getCreated())
+                .created(request.getCreated().truncatedTo(ChronoUnit.MICROS))
                 .requester(request.getRequester().getId())
                 .status(request.getStatus().toString())
                 .build();
     }
+
 }
