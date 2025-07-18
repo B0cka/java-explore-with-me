@@ -36,7 +36,7 @@ public class AdminEventController {
                                                         @Valid SearchEventParamsAdmin params) {
 
         statsClient.createHit(request);
-        List<EventFullDto> list =adminEventService.getEvents(params);
+        List<EventFullDto> list = adminEventService.getEvents(params);
         return ResponseEntity.ok(list != null ? list : List.of());
     }
 
