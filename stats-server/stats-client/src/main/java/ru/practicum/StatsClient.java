@@ -26,7 +26,7 @@ public class StatsClient {
     }
 
     public String createHit(HttpServletRequest request) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         RequestDto requestDto = new RequestDto();
         requestDto.setApp("ewm-main-service");
