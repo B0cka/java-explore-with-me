@@ -28,7 +28,7 @@ public class AdminUserController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto createUser(@Valid @RequestBody NewUserRequest newUserRequest, HttpServletRequest request) {
+    public UserDto createUser(@RequestBody @Valid NewUserRequest newUserRequest, HttpServletRequest request) {
         statsClient.createHit(request);
         return userService.createUser(newUserRequest);
     }
