@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.practicum.admin.dto.*;
+import ru.practicum.admin.exseptions.BadRequestException;
 import ru.practicum.admin.exseptions.ConflictException;
 import ru.practicum.admin.exseptions.NotFoundException;
 import ru.practicum.admin.mapper.EventMapper;
@@ -38,7 +39,7 @@ public class AdminEventServiceImpl implements AdminEventService {
     public EventFullDto updateEventFromAdmin(Long eventId, UpdateEventAdminRequest updateEvent) {
         Event oldEvent = checkEvent(eventId);
         if (oldEvent.getEventStatus().equals(EventStatus.PUBLISHED) || oldEvent.getEventStatus().equals(EventStatus.CANCELED)) {
-            throw new ConflictException("Можно изменить только неподтвержденное событие");
+            throw new BadRequestException("Можно изменить только неподтвержденное событие");
         }
         boolean hasChanges = false;
         Event eventForUpdate = universalUpdate(oldEvent, updateEvent);

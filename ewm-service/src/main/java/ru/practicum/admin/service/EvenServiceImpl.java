@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import ru.practicum.StatsClient;
 import ru.practicum.admin.dto.*;
+import ru.practicum.admin.exseptions.BadRequestException;
 import ru.practicum.admin.exseptions.ConflictException;
 import ru.practicum.admin.mapper.LocationMapper;
 import ru.practicum.admin.mapper.RequestMapper;
@@ -134,7 +135,7 @@ public class EvenServiceImpl implements EventService {
 
         if (searchEventParams.getRangeEnd() != null && searchEventParams.getRangeStart() != null) {
             if (searchEventParams.getRangeEnd().isBefore(searchEventParams.getRangeStart())) {
-                throw new ConflictException("Дата окончания не может быть раньше даты начала");
+                throw new BadRequestException("Дата окончания не может быть раньше даты начала");
             }
         }
 
