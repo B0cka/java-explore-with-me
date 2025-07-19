@@ -1,10 +1,11 @@
 package ru.practicum.statsdto;
 
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 @Data
-@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RequestDto {
     private String app;
     private String uri;
@@ -15,4 +16,31 @@ public class RequestDto {
         return app;
     }
 
+    public void setApp(String app) {
+        this.app = app;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
 }

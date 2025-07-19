@@ -14,5 +14,15 @@ public class StatsDto {
 
     private Long hits;
 
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
 
+    public void setApp(String app) {
+        this.app = app;
+    }
+
+    public void setHits(Long hits) {
+        this.hits = hits;
+    }
 }
