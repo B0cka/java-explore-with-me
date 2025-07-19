@@ -1,12 +1,9 @@
 package ru.practicum.admin.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import ru.practicum.StatsClient;
@@ -19,12 +16,10 @@ import ru.practicum.admin.mapper.LocationMapper;
 import ru.practicum.admin.model.*;
 import ru.practicum.admin.repository.CategoryRepository;
 import ru.practicum.admin.repository.EventRepository;
-import ru.practicum.admin.repository.LocationRepository;
 import ru.practicum.admin.repository.RequestRepository;
 import ru.practicum.statsdto.StatsDto;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
