@@ -3,27 +3,31 @@ package ru.practicum.admin.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import ru.practicum.StatsClient;
 import ru.practicum.admin.dto.*;
 import ru.practicum.admin.exseptions.BadRequestException;
 import ru.practicum.admin.exseptions.ConflictException;
 import ru.practicum.admin.exseptions.NotFoundException;
 import ru.practicum.admin.mapper.EventMapper;
 import ru.practicum.admin.mapper.LocationMapper;
-import ru.practicum.admin.model.Category;
-import ru.practicum.admin.model.Event;
-import ru.practicum.admin.model.Location;
-import ru.practicum.admin.model.SearchEventParamsAdmin;
+import ru.practicum.admin.model.*;
 import ru.practicum.admin.repository.CategoryRepository;
 import ru.practicum.admin.repository.EventRepository;
 import ru.practicum.admin.repository.LocationRepository;
+import ru.practicum.admin.repository.RequestRepository;
+import ru.practicum.statsdto.StatsDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,8 +36,9 @@ import java.util.stream.Collectors;
 public class AdminEventServiceImpl implements AdminEventService {
 
     private final EventRepository eventRepository;
-    private final LocationRepository locationRepository;
+    private final StatsClient statsClient;
     private final CategoryRepository categoryRepository;
+    private final RequestRepository requestRepository;
 
     @Override
     public EventFullDto updateEventFromAdmin(Long eventId, UpdateEventAdminRequest updateEvent) {
@@ -80,43 +85,72 @@ public class AdminEventServiceImpl implements AdminEventService {
     }
 
     @Override
-    @Transactional
-    public List<EventFullDto> getEvents(SearchEventParamsAdmin params) {
-        Specification<Event> spec = Specification.where(null);
+    public List<EventFullDto> getEvents(SearchEventParamsAdmin searchEventParamsAdmin) {
+        PageRequest pageable = PageRequest.of(
+                searchEventParamsAdmin.getFrom() / searchEventParamsAdmin.getSize(),
+                searchEventParamsAdmin.getSize()
+        );
 
-        if (params.getUsers() != null && !params.getUsers().isEmpty()) {
-            spec = spec.and((root, query, cb) ->
-                    root.get("initiator").get("id").in(params.getUsers()));
+        Specification<Event> specification = Specification.where(null);
+
+        if (searchEventParamsAdmin.getUsers() != null && !searchEventParamsAdmin.getUsers().isEmpty()) {
+            specification = specification.and((root, query, cb) ->
+                    root.get("initiator").get("id").in(searchEventParamsAdmin.getUsers()));
+        }
+        if (searchEventParamsAdmin.getStates() != null && !searchEventParamsAdmin.getStates().isEmpty()) {
+            specification = specification.and((root, query, cb) ->
+                    root.get("eventStatus").as(String.class).in(searchEventParamsAdmin.getStates()));
+        }
+        if (searchEventParamsAdmin.getCategories() != null && !searchEventParamsAdmin.getCategories().isEmpty()) {
+            specification = specification.and((root, query, cb) ->
+                    root.get("category").get("id").in(searchEventParamsAdmin.getCategories()));
+        }
+        if (searchEventParamsAdmin.getRangeStart() != null) {
+            specification = specification.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("eventDate"), searchEventParamsAdmin.getRangeStart()));
+        }
+        if (searchEventParamsAdmin.getRangeEnd() != null) {
+            specification = specification.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("eventDate"), searchEventParamsAdmin.getRangeEnd()));
         }
 
-        if (params.getStates() != null && !params.getStates().isEmpty()) {
-            spec = spec.and((root, query, cb) ->
-                    root.get("eventStatus").as(String.class).in(params.getStates()));
+        Page<Event> events = eventRepository.findAll(specification, pageable);
+        List<Event> eventList = events.getContent();
+        if (eventList == null || eventList.isEmpty()) {
+            return List.of();
         }
 
-        if (params.getCategories() != null && !params.getCategories().isEmpty()) {
-            spec = spec.and((root, query, cb) ->
-                    root.get("category").get("id").in(params.getCategories()));
-        }
+        Map<Long, List<Request>> confirmedRequestsMap = getConfirmedRequestsCount(eventList);
 
-        if (params.getRangeStart() != null) {
-            spec = spec.and((root, query, cb) ->
-                    cb.greaterThanOrEqualTo(root.get("eventDate"), params.getRangeStart()));
-        }
+        List<String> uris = eventList.stream()
+                .map(event -> "/events/" + event.getId())
+                .collect(Collectors.toList());
 
-        if (params.getRangeEnd() != null) {
-            spec = spec.and((root, query, cb) ->
-                    cb.lessThanOrEqualTo(root.get("eventDate"), params.getRangeEnd()));
-        }
+        LocalDateTime start = eventList.stream()
+                .map(Event::getCreatedDate)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(LocalDateTime.now().minusYears(10));
 
-        Pageable pageable = PageRequest.of(params.getFrom() / params.getSize(), params.getSize(), Sort.by("eventDate").descending());
+        LocalDateTime end = LocalDateTime.now();
 
-        List<Event> events = eventRepository.findAll(spec, pageable).getContent();
+        List<StatsDto> viewStats = statsClient.getStats(start, end, uris, true);
 
-        return events.stream()
-                .map(EventMapper::toEventFullDto)
+        Map<Long, Long> viewsMap = viewStats.stream()
+                .collect(Collectors.toMap(
+                        s -> Long.parseLong(s.getUri().split("/")[2]),
+                        StatsDto::getHits
+                ));
+
+        return eventList.stream()
+                .map(event -> EventMapper.toEventFullDtoForAdmin(
+                        event,
+                        confirmedRequestsMap.getOrDefault(event.getId(), List.of()).size(),
+                        viewsMap.getOrDefault(event.getId(), 0L)
+                ))
                 .collect(Collectors.toList());
     }
+
 
     private Event universalUpdate(Event oldEvent, UpdateEventRequest updateEvent) {
         boolean hasChanges = false;
@@ -167,6 +201,12 @@ public class AdminEventServiceImpl implements AdminEventService {
             oldEvent = null;
         }
         return oldEvent;
+    }
+
+    private Map<Long, List<Request>> getConfirmedRequestsCount(List<Event> events) {
+        List<Request> requests = requestRepository.findAllByEventIdInAndStatus(events
+                .stream().map(Event::getId).collect(Collectors.toList()), RequestStatus.CONFIRMED);
+        return requests.stream().collect(Collectors.groupingBy(r -> r.getEvent().getId()));
     }
 
     private Event checkEvent(Long eventId) {

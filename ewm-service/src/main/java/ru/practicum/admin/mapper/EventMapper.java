@@ -24,6 +24,27 @@ public class EventMapper {
                 .build();
     }
 
+    public EventFullDto toEventFullDtoForAdmin(Event event, int confirmedRequests, long views) {
+        return EventFullDto.builder()
+                .id(event.getId())
+                .annotation(event.getAnnotation())
+                .category(CategoryMapper.toCategoryDto(event.getCategory()))
+                .createdOn(event.getCreatedDate())
+                .description(event.getDescription())
+                .eventDate(event.getEventDate())
+                .initiator(UserMapper.toUserShortDto(event.getInitiator()))
+                .location(LocationMapper.toLocationDto(event.getLocation()))
+                .paid(event.isPaid())
+                .participantLimit(event.getParticipantLimit())
+                .publishedOn(event.getPublishedOn())
+                .requestModeration(event.getRequestModeration())
+                .state(event.getEventStatus())
+                .title(event.getTitle())
+                .confirmedRequests(confirmedRequests)
+                .views(views)
+                .build();
+    }
+
     public EventShortDto toEventShortDto(Event event) {
         return EventShortDto.builder()
                 .id(event.getId())
