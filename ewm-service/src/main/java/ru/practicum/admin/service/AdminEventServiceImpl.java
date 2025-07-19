@@ -162,7 +162,7 @@ public class AdminEventServiceImpl implements AdminEventService {
         Long gotCategory = updateEvent.getCategory();
         if (gotCategory != null) {
             Category category = categoryRepository.findById(gotCategory)
-                            .orElseThrow(() -> new NotFoundException("ТАкой категории не существует"));
+                    .orElseThrow(() -> new NotFoundException("ТАкой категории не существует"));
 
             oldEvent.setCategory(category);
             hasChanges = true;
