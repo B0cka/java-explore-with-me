@@ -16,8 +16,7 @@ public class Controller {
     private final StatsService statsService;
 
     @PostMapping("/hit")
-    public String createHit(@RequestBody RequestDto requestDto) {
-        return statsService.createHit(requestDto);
+    public void createHit(@RequestBody RequestDto requestDto){statsService.createHit(requestDto);
     }
 
     @GetMapping("/stats")

@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 import ru.practicum.model.Hit;
 import ru.practicum.repository.StatsRepository;
@@ -24,7 +25,7 @@ public class StatsServiceImpl implements StatsService {
 
 
     @Override
-    public String createHit(RequestDto requestDto) {
+    public void createHit(RequestDto requestDto) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String ip = requestDto.getIp();
         String uri = requestDto.getUri();
@@ -39,10 +40,8 @@ public class StatsServiceImpl implements StatsService {
                 .build();
         try {
             statsRepository.save(hit);
-            return "Информация сохранена";
         } catch (Exception e) {
             log.error("Ошибка при отправке данных на stats-server: {}", e.getMessage());
-            return "Ошибка при сохранении";
         }
     }
 
@@ -54,6 +53,10 @@ public class StatsServiceImpl implements StatsService {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             LocalDateTime startTime = LocalDateTime.parse(start, formatter);
             LocalDateTime endTime = LocalDateTime.parse(end, formatter);
+
+            if (endTime.isBefore(startTime)) {
+                throw new BadRequestException("Конец должен быть позже начала!");
+            }
 
             List<Object[]> rawData = unique
                     ? statsRepository.findUniqueStats(startTime, endTime, uris)
