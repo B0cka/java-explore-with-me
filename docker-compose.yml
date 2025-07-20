@@ -9,20 +9,26 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 1234
 
+  ewm-service:
+    build:
+      context: ./ewm-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - stats-server
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=1234
+      - SERVICES_STATS_SERVICE_URI=http://stats-server:9090
+      - SERVER_PORT=8080
+
   db:
     image: postgres:16.1
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 1234
     ports:
-      - "6541:5432"
+      - "5434:5432"
 
-
-#  ewm-service:
-#    build:
-#      context: ./stats-server
-#    ports:
-#      - "8080:8080"
-#
-#  ewm-db:
-#    image: postgres:16.1
