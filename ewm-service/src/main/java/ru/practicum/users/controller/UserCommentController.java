@@ -19,7 +19,7 @@ public class UserCommentController {
     public CommentDto createComment(@PathVariable("userId") Long userId,
                                     @PathVariable("eventId") Long eventId,
                                     @RequestBody CommentRequestDto requestDto,
-                                    HttpServletRequest request){
+                                    HttpServletRequest request) {
 
         statsClient.createHit(request);
         return userCommentService.createComment(userId, eventId, requestDto);
@@ -31,7 +31,7 @@ public class UserCommentController {
                                     @PathVariable("commentId") Long commentId,
                                     @PathVariable("eventId") Long eventId,
                                     @RequestBody CommentRequestDto requestDto,
-                                    HttpServletRequest request){
+                                    HttpServletRequest request) {
 
         statsClient.createHit(request);
         return userCommentService.updateComment(userId, commentId, eventId, requestDto);
@@ -42,7 +42,7 @@ public class UserCommentController {
     public void deleteComment(@PathVariable("userId") Long userId,
                               @PathVariable("commentId") Long commentId,
                               @PathVariable("eventId") Long eventId,
-                              HttpServletRequest request){
+                              HttpServletRequest request) {
 
         statsClient.createHit(request);
         userCommentService.deleteComment(userId, commentId, eventId);
