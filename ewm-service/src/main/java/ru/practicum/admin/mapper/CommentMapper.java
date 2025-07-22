@@ -8,7 +8,7 @@ import ru.practicum.admin.model.Comment;
 @UtilityClass
 public class CommentMapper {
 
-    public CommentDto toDto(Comment comment){
+    public CommentDto toDto(Comment comment) {
 
         return CommentDto.builder()
                 .id(comment.getId())
@@ -19,7 +19,7 @@ public class CommentMapper {
 
     }
 
-    public CommentFullDto toFullDto(Comment comment){
+    public CommentFullDto toFullDto(Comment comment) {
 
         return CommentFullDto.builder()
                 .id(comment.getId())

@@ -2,11 +2,9 @@ package ru.practicum.admin.mapper;
 
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.admin.dto.CommentFullDto;
 import ru.practicum.admin.dto.EventFullDto;
 import ru.practicum.admin.dto.EventShortDto;
 import ru.practicum.admin.dto.NewEventDto;
-import ru.practicum.admin.model.Comment;
 import ru.practicum.admin.model.CommentStatus;
 import ru.practicum.admin.model.Event;
 
@@ -77,7 +75,7 @@ public class EventMapper {
     }
 
     public EventFullDto toEventFullDto(Event event) {
-         EventFullDto eventFull =  EventFullDto.builder()
+        EventFullDto eventFull = EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryMapper.toCategoryDto(event.getCategory()))
@@ -94,15 +92,15 @@ public class EventMapper {
                 .title(event.getTitle())
                 .confirmedRequests(0)
                 .views(0L) // изменяется в дальнейшем
-                 .comments(
-                         event.getComments() == null ? List.of() :
-                                 event.getComments().stream()
-                                         .filter(c -> c.getStatus() == CommentStatus.APPROVED)
-                                         .map(CommentMapper::toFullDto)
-                                         .toList()
-                 )
-                 .build();
+                .comments(
+                        event.getComments() == null ? List.of() :
+                                event.getComments().stream()
+                                        .filter(c -> c.getStatus() == CommentStatus.APPROVED)
+                                        .map(CommentMapper::toFullDto)
+                                        .toList()
+                )
+                .build();
 
-         return eventFull;
+        return eventFull;
     }
 }

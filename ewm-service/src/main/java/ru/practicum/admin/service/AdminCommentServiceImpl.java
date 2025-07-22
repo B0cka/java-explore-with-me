@@ -21,7 +21,7 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class AdminCommentServiceImpl implements AdminCommentService{
+public class AdminCommentServiceImpl implements AdminCommentService {
     private final CommentRepository commentRepository;
     private final EventRepository eventRepository;
 
@@ -41,7 +41,7 @@ public class AdminCommentServiceImpl implements AdminCommentService{
             comment.setPublishedOn(LocalDateTime.now());
         }
 
-        if(updateCommentRequest.getStatus() == CommentStatus.REJECTED){
+        if (updateCommentRequest.getStatus() == CommentStatus.REJECTED) {
             commentRepository.delete(comment);
             return null;
         }
@@ -90,7 +90,6 @@ public class AdminCommentServiceImpl implements AdminCommentService{
                 .map(CommentMapper::toFullDto)
                 .toList();
     }
-
 
 
     private Comment checkComment(Long commentId) {

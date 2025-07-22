@@ -21,7 +21,7 @@ public class AdminCommentController {
     private final AdminCommentService adminCommentService;
 
     @PatchMapping("/{commentId}/{eventId}")
-    public CommentFullDto updateStatus(@PathVariable Long commentId, @PathVariable  Long eventId, @RequestBody UpdateCommentRequest updateCommentRequest, HttpServletRequest request){
+    public CommentFullDto updateStatus(@PathVariable Long commentId, @PathVariable Long eventId, @RequestBody UpdateCommentRequest updateCommentRequest, HttpServletRequest request) {
 
         statsClient.createHit(request);
         return adminCommentService.updateStatus(commentId, eventId, updateCommentRequest);
@@ -30,7 +30,7 @@ public class AdminCommentController {
 
     @GetMapping
     public ResponseEntity<List<CommentFullDto>> getComments(HttpServletRequest request,
-                                                        @Valid SearchCommentParamsAdmin params) {
+                                                            @Valid SearchCommentParamsAdmin params) {
 
         statsClient.createHit(request);
         List<CommentFullDto> list = adminCommentService.getComments(params);
