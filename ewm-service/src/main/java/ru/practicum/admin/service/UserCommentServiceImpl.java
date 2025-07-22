@@ -29,7 +29,7 @@ public class UserCommentServiceImpl implements UserCommentService {
     private final CommentRepository commentRepository;
 
     @Override
-    public CommentDto createComment(Long userId, Long eventId, CommentRequestDto commentRequestDto){
+    public CommentDto createComment(Long userId, Long eventId, CommentRequestDto commentRequestDto) {
         log.info("Создание комментария с userId={}, eventId={}, test={}", userId, eventId, commentRequestDto.getText());
 
         Event event = checkEvent(eventId);
@@ -79,9 +79,9 @@ public class UserCommentServiceImpl implements UserCommentService {
     }
 
     @Override
-    public void deleteComment(Long userId, Long commentId, Long eventId){
+    public void deleteComment(Long userId, Long commentId, Long eventId) {
         log.info("Удаление комментария: userId={}, commentId={}, eventId={}, text={}",
-                userId, commentId, eventId );
+                userId, commentId, eventId);
 
         checkEvent(eventId);
         checkUser(userId);
