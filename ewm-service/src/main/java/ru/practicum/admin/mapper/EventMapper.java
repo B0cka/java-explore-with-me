@@ -2,10 +2,15 @@ package ru.practicum.admin.mapper;
 
 
 import lombok.experimental.UtilityClass;
+import ru.practicum.admin.dto.CommentFullDto;
 import ru.practicum.admin.dto.EventFullDto;
 import ru.practicum.admin.dto.EventShortDto;
 import ru.practicum.admin.dto.NewEventDto;
+import ru.practicum.admin.model.Comment;
+import ru.practicum.admin.model.CommentStatus;
 import ru.practicum.admin.model.Event;
+
+import java.util.List;
 
 @UtilityClass
 public class EventMapper {
@@ -42,6 +47,13 @@ public class EventMapper {
                 .title(event.getTitle())
                 .confirmedRequests(confirmedRequests)
                 .views(views)
+                .comments(
+                        event.getComments() == null ? List.of() :
+                                event.getComments().stream()
+                                        .filter(c -> c.getStatus() == CommentStatus.APPROVED)
+                                        .map(CommentMapper::toFullDto)
+                                        .toList()
+                )
                 .build();
     }
 
@@ -53,12 +65,19 @@ public class EventMapper {
                 .eventDate(event.getEventDate())
                 .initiator(UserMapper.toUserShortDto(event.getInitiator()))
                 .paid(event.isPaid())
+                .comments(
+                        event.getComments() == null ? List.of() :
+                                event.getComments().stream()
+                                        .filter(c -> c.getStatus() == CommentStatus.APPROVED)
+                                        .map(CommentMapper::toFullDto)
+                                        .toList()
+                )
                 .title(event.getTitle())
                 .build();
     }
 
     public EventFullDto toEventFullDto(Event event) {
-        return EventFullDto.builder()
+         EventFullDto eventFull =  EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(CategoryMapper.toCategoryDto(event.getCategory()))
@@ -75,6 +94,15 @@ public class EventMapper {
                 .title(event.getTitle())
                 .confirmedRequests(0)
                 .views(0L) // изменяется в дальнейшем
-                .build();
+                 .comments(
+                         event.getComments() == null ? List.of() :
+                                 event.getComments().stream()
+                                         .filter(c -> c.getStatus() == CommentStatus.APPROVED)
+                                         .map(CommentMapper::toFullDto)
+                                         .toList()
+                 )
+                 .build();
+
+         return eventFull;
     }
 }

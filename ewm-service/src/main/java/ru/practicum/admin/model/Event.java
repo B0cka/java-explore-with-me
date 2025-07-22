@@ -5,6 +5,8 @@ import lombok.*;
 import ru.practicum.admin.dto.EventStatus;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -35,6 +37,8 @@ public class Event {
     private Location location;
     @Column(name = "paid")
     private boolean paid;
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
     @Column(name = "participant_limit")
     private Integer participantLimit;
     @Column(name = "published_date")

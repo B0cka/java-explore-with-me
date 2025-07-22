@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import ru.practicum.users.dto.CategoryDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +27,7 @@ public class EventFullDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     private UserShortDto initiator;
+    private List<CommentFullDto> comments = new ArrayList<>();
     private LocationDto location;
     private Boolean paid;
     private Integer participantLimit;
