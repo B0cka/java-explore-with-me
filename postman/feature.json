@@ -123,7 +123,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/users/:userId/comment/:eventId",
+					"raw": "http://localhost:8080/users/:userId/comment/{{eventID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -133,15 +133,11 @@
 						"users",
 						":userId",
 						"comment",
-						":eventId"
+						"{{eventID}}"
 					],
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
-						},
-						{
-							"key": "eventId",
 							"value": "1"
 						}
 					]
