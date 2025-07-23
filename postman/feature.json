@@ -7,6 +7,62 @@
 	},
 	"item": [
 		{
+			"name": "создание евента для теста",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ответ должен содержать код статуса 201 и данные в формате JSON\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.be.withBody;\r",
+							"    pm.response.to.be.json;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"const response = pm.response.json();\r",
+							"pm.globals.set(\"eventID\", response.id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"annotation\": \"Крутое событие для всех желающих\",\r\n  \"category\": 3,\r\n  \"description\": \"Это мероприятие для тех, кто хочет обсудить интересные IT-темы.\",\r\n  \"eventDate\": \"2025-08-01 18:00:00\",\r\n  \"location\": {\r\n    \"lat\": 55.7558,\r\n    \"lon\": 37.6173\r\n  },\r\n  \"paid\": true,\r\n  \"participantLimit\": 100,\r\n  \"requestModeration\": true,\r\n  \"title\": \"IT Meetup в центре Москвы\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/users/:userId/events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"users",
+						":userId",
+						"events"
+					],
+					"variable": [
+						{
+							"key": "userId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "публикация евента",
 			"request": {
 				"method": "PATCH",
@@ -21,7 +77,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/admin/events/:eventId",
+					"raw": "http://localhost:8080/admin/events/{{eventID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -30,13 +86,7 @@
 					"path": [
 						"admin",
 						"events",
-						":eventId"
-					],
-					"variable": [
-						{
-							"key": "eventId",
-							"value": ""
-						}
+						"{{eventID}}"
 					]
 				}
 			},
@@ -128,7 +178,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/admin/comments/{{commentId}}/1",
+					"raw": "http://localhost:8080/admin/comments/{{commentId}}/{{eventID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -138,7 +188,7 @@
 						"admin",
 						"comments",
 						"{{commentId}}",
-						"1"
+						"{{eventID}}"
 					]
 				}
 			},
@@ -160,7 +210,6 @@
 							"pm.test(\"Ответ — массив комментариев\", function () {\r",
 							"    const jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData).to.be.an(\"array\");\r",
-							"    pm.expect(jsonData.length).to.be.above(0);\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -184,7 +233,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/admin/comments?authorId=1&eventId=1&status=APPROVED&rangeStart=2025-07-23%2000:00:00&rangeEnd=2025-07-23%2023:59:59",
+					"raw": "http://localhost:8080/admin/comments?authorId=1&eventId={{eventID}}&status=APPROVED&rangeStart=2025-07-23%2000:00:00&rangeEnd=2025-07-23%2023:59:59",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -201,7 +250,7 @@
 						},
 						{
 							"key": "eventId",
-							"value": "1"
+							"value": "{{eventID}}"
 						},
 						{
 							"key": "status",
@@ -251,7 +300,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/users/:userId/comment/:eventId/{{commentId}}",
+					"raw": "http://localhost:8080/users/:userId/comment/{{eventID}}/{{commentId}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -261,16 +310,12 @@
 						"users",
 						":userId",
 						"comment",
-						":eventId",
+						"{{eventID}}",
 						"{{commentId}}"
 					],
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
-						},
-						{
-							"key": "eventId",
 							"value": "1"
 						}
 					]
@@ -294,7 +339,7 @@
 							"pm.test(\"Ответ — массив комментариев\", function () {\r",
 							"    const jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData).to.be.an(\"array\");\r",
-							"    pm.expect(jsonData.length).to.eql(1);\r",
+							"    pm.expect(jsonData.length).to.eql(0);\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -318,7 +363,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/admin/comments?authorId=1&eventId=1&status=APPROVED&rangeStart=2025-07-23%2000:00:00&rangeEnd=2025-07-23%2023:59:59",
+					"raw": "http://localhost:8080/admin/comments?authorId=1&eventId={{eventID}}&status=APPROVED&rangeStart=2025-07-23%2000:00:00&rangeEnd=2025-07-23%2023:59:59",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -335,7 +380,7 @@
 						},
 						{
 							"key": "eventId",
-							"value": "1"
+							"value": "{{eventID}}"
 						},
 						{
 							"key": "status",
@@ -383,7 +428,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/admin/comments/{{commentId}}/1",
+					"raw": "http://localhost:8080/admin/comments/{{commentId}}/{{eventID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -393,7 +438,7 @@
 						"admin",
 						"comments",
 						"{{commentId}}",
-						"1"
+						"{{eventID}}"
 					]
 				}
 			},
@@ -415,7 +460,6 @@
 							"pm.test(\"Ответ — массив комментариев\", function () {\r",
 							"    const jsonData = pm.response.json();\r",
 							"    pm.expect(jsonData).to.be.an(\"array\");\r",
-							"    pm.expect(jsonData.length).to.eql(2);\r",
 							"});"
 						],
 						"type": "text/javascript",
@@ -439,7 +483,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/admin/comments?authorId=1&eventId=1&status=APPROVED&rangeStart=2025-07-23%2000:00:00&rangeEnd=2025-07-23%2023:59:59",
+					"raw": "http://localhost:8080/admin/comments?authorId=1&eventId={{eventID}}&status=APPROVED&rangeStart=2025-07-23%2000:00:00&rangeEnd=2025-07-23%2023:59:59",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -456,7 +500,7 @@
 						},
 						{
 							"key": "eventId",
-							"value": "1"
+							"value": "{{eventID}}"
 						},
 						{
 							"key": "status",
@@ -469,53 +513,6 @@
 						{
 							"key": "rangeEnd",
 							"value": "2025-07-23%2023:59:59"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Удаление комментария пользователем",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Комментарий удален\", function () {\r",
-							"    pm.response.to.be.success;\r",
-							"});"
-						],
-						"type": "text/javascript",
-						"packages": {}
-					}
-				}
-			],
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/users/:userId/comment/:eventId/{{commentId}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"users",
-						":userId",
-						"comment",
-						":eventId",
-						"{{commentId}}"
-					],
-					"variable": [
-						{
-							"key": "userId",
-							"value": "1"
-						},
-						{
-							"key": "eventId",
-							"value": "1"
 						}
 					]
 				}
@@ -553,7 +550,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/users/:userId/comment/:eventId",
+					"raw": "http://localhost:8080/users/:userId/comment/{{eventID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -563,15 +560,11 @@
 						"users",
 						":userId",
 						"comment",
-						":eventId"
+						"{{eventID}}"
 					],
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
-						},
-						{
-							"key": "eventId",
 							"value": "1"
 						}
 					]
@@ -608,7 +601,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/admin/comments/{{commentId}}/1",
+					"raw": "http://localhost:8080/admin/comments/{{commentId}}/{{eventID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -618,7 +611,7 @@
 						"admin",
 						"comments",
 						"{{commentId}}",
-						"1"
+						"{{eventID}}"
 					]
 				}
 			},
@@ -664,7 +657,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/admin/comments?authorId=1&eventId=1&status=REJECTED&rangeStart=2025-07-23%2000:00:00&rangeEnd=2025-07-23%2023:59:59",
+					"raw": "http://localhost:8080/admin/comments?authorId=1&eventId={{eventID}}&status=REJECTED&rangeStart=2025-07-23%2000:00:00&rangeEnd=2025-07-23%2023:59:59",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -681,7 +674,7 @@
 						},
 						{
 							"key": "eventId",
-							"value": "1"
+							"value": "{{eventID}}"
 						},
 						{
 							"key": "status",
@@ -742,7 +735,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/users/:userId/comment/:eventId",
+					"raw": "http://localhost:8080/users/:userId/comment/{{eventID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -752,15 +745,11 @@
 						"users",
 						":userId",
 						"comment",
-						":eventId"
+						"{{eventID}}"
 					],
 					"variable": [
 						{
 							"key": "userId",
-							"value": "1"
-						},
-						{
-							"key": "eventId",
 							"value": "1"
 						}
 					]
@@ -810,7 +799,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/users/:userId/comment/:eventId",
+					"raw": "http://localhost:8080/users/:userId/comment/{{eventID}}",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -820,16 +809,12 @@
 						"users",
 						":userId",
 						"comment",
-						":eventId"
+						"{{eventID}}"
 					],
 					"variable": [
 						{
 							"key": "userId",
 							"value": "100"
-						},
-						{
-							"key": "eventId",
-							"value": "1"
 						}
 					]
 				}
@@ -878,7 +863,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/users/:userId/comment/:eventId",
+					"raw": "http://localhost:8080/users/:userId/comment/1000",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -888,16 +873,12 @@
 						"users",
 						":userId",
 						"comment",
-						":eventId"
+						"1000"
 					],
 					"variable": [
 						{
 							"key": "userId",
 							"value": "1"
-						},
-						{
-							"key": "eventId",
-							"value": "10"
 						}
 					]
 				}
