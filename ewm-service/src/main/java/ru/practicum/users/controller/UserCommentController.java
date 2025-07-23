@@ -1,7 +1,9 @@
 package ru.practicum.users.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.StatsClient;
 import ru.practicum.admin.dto.CommentDto;
@@ -11,6 +13,7 @@ import ru.practicum.admin.service.UserCommentService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
+@Validated
 public class UserCommentController {
     private final StatsClient statsClient;
     private final UserCommentService userCommentService;
@@ -18,7 +21,7 @@ public class UserCommentController {
     @PostMapping("/{userId}/comment/{eventId}")
     public CommentDto createComment(@PathVariable("userId") Long userId,
                                     @PathVariable("eventId") Long eventId,
-                                    @RequestBody CommentRequestDto requestDto,
+                                    @RequestBody @Valid CommentRequestDto requestDto,
                                     HttpServletRequest request) {
 
         statsClient.createHit(request);
@@ -30,7 +33,7 @@ public class UserCommentController {
     public CommentDto updateComment(@PathVariable("userId") Long userId,
                                     @PathVariable("commentId") Long commentId,
                                     @PathVariable("eventId") Long eventId,
-                                    @RequestBody CommentRequestDto requestDto,
+                                    @RequestBody @Valid CommentRequestDto requestDto,
                                     HttpServletRequest request) {
 
         statsClient.createHit(request);

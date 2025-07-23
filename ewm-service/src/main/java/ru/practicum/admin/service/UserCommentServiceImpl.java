@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.admin.dto.CommentDto;
 import ru.practicum.admin.dto.CommentRequestDto;
 import ru.practicum.admin.dto.EventStatus;
+import ru.practicum.admin.exseptions.BadRequestException;
 import ru.practicum.admin.exseptions.ConflictException;
 import ru.practicum.admin.exseptions.NotFoundException;
 import ru.practicum.admin.mapper.CommentMapper;
@@ -33,6 +34,12 @@ public class UserCommentServiceImpl implements UserCommentService {
         log.info("Создание комментария с userId={}, eventId={}, test={}", userId, eventId, commentRequestDto.getText());
 
         Event event = checkEvent(eventId);
+
+        if (commentRequestDto.getText().isBlank()) {
+
+            throw new BadRequestException("Нельзя писать пустые комментарии!");
+
+        }
 
         if (!event.getEventStatus().equals(EventStatus.PUBLISHED)) {
             throw new ConflictException("Нельзя комментировать неопубликованное событие.");
