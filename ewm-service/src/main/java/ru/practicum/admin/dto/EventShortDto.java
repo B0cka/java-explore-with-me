@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import ru.practicum.users.dto.CategoryDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +22,7 @@ public class EventShortDto {
     private Integer confirmedRequests;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
+    private List<CommentFullDto> comments = new ArrayList<>();
     private UserShortDto initiator;
     private Boolean paid;
     private String title;
